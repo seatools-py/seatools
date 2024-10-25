@@ -1,4 +1,5 @@
-# seatools Python集成式工具包 (Python >= 3.9)
+# Seatools Python集成式工具包 (Python >= 3.9)
+
 
 ## 仓库地址: https://gitee.com/dragons96/seatools
 

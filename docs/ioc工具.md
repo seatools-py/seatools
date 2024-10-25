@@ -4,6 +4,57 @@
 1. ioc 工具中的所有的bean均为代理对象, 代理对象代理了一系列方法与调用逻辑, 但是代理对象仍然不是原生类型, 针对py的基本数据类型或需要使用原始类型的场景, 请先获取bean然后调用bean.get()方法获取原始数据对象
 2. ioc 依赖注入使用的代理对象+延迟注入机制实现, 请勿在构造函数, bean初始化方法中对依赖进行操作与调用, 若需要对依赖进行额外处理请在`__post_construct__`方法或继承`seatools.beans.factory.InitializingBean`类在`after_properties_set`方法中实现
 
+实践指南:
+1. 建议在程序入口处执行`seatools.ioc.run`方法确保`ioc`的初始化
+2. 建议所有单例的`bean`通过`@Bean`装饰器/注解类名创建, 多例场景通过`@Bean`装饰函数创建(暂不支持`async`)
+3. 所有需要获取依赖的地方建议使用`Autowired`获取, 示例如下:
+```python
+from seatools.ioc import run, Bean, Autowired
+
+
+# 单例
+@Bean
+class A:
+    def println(self):
+        print('a')
+
+
+class B:
+
+    def __init__(self, v: str, a: A):
+        self._a = a
+        self._v = v
+
+    def println(self):
+        print(f'b{self._v}')
+        self._a.println()
+
+# B 的第一个实例b1
+@Bean(name='b1', primary=True)
+def b1(a: A = Autowired(cls=A)):
+    return B('1', a=a)
+
+
+# B 的第二个实例b2
+@Bean(name='b2')
+def b2(a: A = Autowired(cls=A)):
+    return B('2', a=a)
+
+# 启动 ioc
+run('xxx', config_dir='./config')
+
+# 通过ioc获取A实例, 该类型只有一个实例时, 可直接通过类型获取
+o_a: A = Autowired(cls=A)
+o_a.println()
+
+# 通过ioc获取B实例, B存在多个实例, 由于b1实例的primary为true, 直接按照类型获取ioc容器会返回primary的实例
+o_b1: B = Autowired(cls=B) # 或者可通过名称+类型获取 o_b1: B = Autowired('b1', cls=B)
+o_b1.println()
+
+o_b2: B = Autowired('b2', cls=B) # 由于B实例存在多个, 所以必须添加类型, 这里ioc里b2名称的容器只有1个, 可简写为o_b2: B = Autowired('b2')
+o_b2.println()
+```
+
 基本功能:
 1. `seatools.ioc.run` - `function`: ioc 启动方法, 扫描指定模块及所有子模块中的所有的bean, 注册进ioc容器中, 使用示例
 ```python
