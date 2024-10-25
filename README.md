@@ -1,6 +1,6 @@
 # seatools Python集成式工具包 (Python >= 3.9)
 
-## 仓库地址: https://gitee.com/dragons96/py_seatools
+## 仓库地址: https://gitee.com/dragons96/seatools
 
 ## 该仓库设立初衷旨在针对各业务场景提供更编辑的操作方式, 并且任意工具均可按需安装依赖, 使得程序更轻量
 
