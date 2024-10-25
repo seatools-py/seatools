@@ -1,0 +1,10 @@
+pymysql>=1.1.0
+dbutils>=3.0.3
+sqlalchemy>=2.0.27
+impyla>=0.19.0
+clickhouse-driver>=0.2.7
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+redis-om>=0.3.2
+undetected-chromedriver>=3.5.5
+
