@@ -1,6 +1,6 @@
 import random
 import time
-from typing import Union, Callable, Dict
+from typing import Union, Callable, Dict, List
 
 import undetected_chromedriver as uc
 from selenium.webdriver.support.ui import WebDriverWait
@@ -63,11 +63,18 @@ class Chrome(uc.Chrome):
                          **kw)
 
     def wait_el(self, locator: str, by: str = uc.By.XPATH, timeout: int = 10) -> uc.WebElement:
-        """等待timeout秒并获取元素, 获取失败则产生timeout异常"""
+        """等待timeout秒并获取1个元素, 获取失败则产生timeout异常"""
         WebDriverWait(self, timeout).until(
             EC.presence_of_element_located((by, locator))
         )
         return self.find_element(by, locator)
+
+    def wait_els(self, locator: str, by: str = uc.By.XPATH, timeout: int = 10) -> List[uc.WebElement]:
+        """等待timeout秒并获取符合条件的元素列表, 获取失败则产生timeout异常"""
+        WebDriverWait(self, timeout).until(
+            EC.presence_of_element_located((by, locator))
+        )
+        return self.find_elements(by, locator)
 
     @classmethod
     def send_keys(cls, el: uc.WebElement, content: str, interval: Union[float, Callable[[], float]]=random.random):
