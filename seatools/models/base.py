@@ -13,8 +13,9 @@ class BaseModel(BM, ABC):
 
     def __init__(self, **kwargs):
         # 针对str类型, 额外支持int, float, bool类型转换
-        for field_name, field_type in self.__annotations__.items():
-            if field_type == str or field_type == Optional[str]:
+        for field_name, field_info in self.model_fields.items():
+            if field_info.annotation == str or field_info.annotation == Optional[str]:
+                field_name = field_info.alias or field_name
                 if field_name in kwargs:
                     value = kwargs[field_name]
                     if isinstance(value, (int, float)):
