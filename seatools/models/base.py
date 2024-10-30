@@ -1,4 +1,5 @@
 from pydantic import BaseModel as BM, ConfigDict, Field
+from pydantic.fields import FieldInfo
 from abc import ABC
 import datetime
 from typing import Optional, Any, List
@@ -12,17 +13,47 @@ class BaseModel(BM, ABC):
     })
 
     def __init__(self, **kwargs):
-        # 针对str类型, 额外支持int, float, bool类型转换
-        for field_name, field_info in self.model_fields.items():
-            if field_info.annotation == str or field_info.annotation == Optional[str]:
-                field_name = field_info.alias or field_name
-                if field_name in kwargs:
-                    value = kwargs[field_name]
-                    if isinstance(value, (int, float)):
-                        kwargs[field_name] = str(value)
-                    elif isinstance(value, bool):
-                        kwargs[field_name] = str(value).lower()
+        handlers = self._type_enhance_handlers()
+        if handlers:
+            for field_name, field_info in self.model_fields.items():
+                for handler in handlers:
+                    handler(field_name, field_info, kwargs)
         super().__init__(**kwargs)
+
+    def _type_enhance_handlers(self):
+        """类型增强处理
+
+        handler 方法签名如下:
+
+        def xxx_handler(field_name: str, field_info: pydantic.fields.FieldInfo, kwargs: dict) -> None:
+            pass
+
+        其中kwargs为输入参数字典
+
+        子类可重写该方法拓展, 示例:
+        class XXXModel(BaseModel):
+
+             def _type_enhance_handlers(self):
+                handlers = super()._type_enhance_handlers()
+                # 添加自定义的增强逻辑
+                handlers.append(...)
+                return handlers
+        """
+
+        def enhance_str_type(field_name: str, field_info: FieldInfo, kwargs: dict):
+            # 针对str类型, 额外支持int, float, bool类型转换
+            if not field_info.annotation == str and not field_info.annotation == Optional[str]:
+                return
+            field_name = field_info.alias or field_name
+            if not field_name in kwargs:
+                return
+            value = kwargs[field_name]
+            if isinstance(value, (int, float)):
+                kwargs[field_name] = str(value)
+            elif isinstance(value, bool):
+                kwargs[field_name] = str(value).lower()
+
+        return [enhance_str_type]
 
 
 class R(BaseModel):
