@@ -3,7 +3,7 @@
 
 ## 仓库地址:
 1. https://github.com/seatools-py/seatools
-2. https://gitee.com/dragons96/seatools
+2. https://gitee.com/seatools-py/seatools
 
 ## 该仓库设立初衷旨在针对各业务场景提供更编辑的操作方式, 并且任意工具均可按需安装依赖, 使得程序更轻量
 
