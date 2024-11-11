@@ -5,6 +5,11 @@
 1. https://github.com/seatools-py/seatools
 2. https://gitee.com/seatools-py/seatools
 
+## Cookiecutter-seatools-python 模板项目地址
+1. https://github.com/seatools-py/cookiecutter-seatools-python
+2. https://gitee.com/seatools-py/cookiecutter-seatools-python
+
+
 ## 该仓库设立初衷旨在针对各业务场景提供更编辑的操作方式, 并且任意工具均可按需安装依赖, 使得程序更轻量
 
 ## 联系方式, qq: 521274311 邮箱: 521274311@qq.com
