@@ -65,6 +65,8 @@ class SimpleBeanFactory(BeanFactory):
                 [bean for bean in beans if class_utils.is_family_type(bean.ioc_type(), required_type)])
             if bean:
                 return bean
+            return None
+
         return self._resolve_bean_from_beans(beans)
 
     def _resolve_type_bean(self, required_type=None):
