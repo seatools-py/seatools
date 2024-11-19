@@ -24,18 +24,18 @@ class BaseBeanProxy(abc.ABC):
 
     def ioc_type(self):
         """获取被代理的类型"""
-        return type(self.get())
+        return type(self.ioc_bean())
 
-    def get(self):
+    def ioc_bean(self):
         """获取被代理的真实对象"""
         return self._obj
 
     def __getattr__(self, item):
-        return getattr(self.get(), item)
+        return getattr(self.ioc_bean(), item)
 
     def __getattribute__(self, item):
         if item.startswith('__') and item.endswith('__'):
-            attr = getattr(self.get(), item)
+            attr = getattr(self.ioc_bean(), item)
             if callable(attr):
                 def wrapper(*args, **kwargs):
                     return attr(*args, **kwargs)
@@ -45,10 +45,10 @@ class BaseBeanProxy(abc.ABC):
         return object.__getattribute__(self, item)
 
     def __call__(self, *args, **kwargs):
-        return self.get()(*args, **kwargs)
+        return self.ioc_bean()(*args, **kwargs)
 
     def __repr__(self):
-        return self.get().__repr__()
+        return self.ioc_bean().__repr__()
 
 
 class ClassBeanProxy(BaseBeanProxy):
@@ -64,7 +64,7 @@ class ClassBeanProxy(BaseBeanProxy):
 
     def instanceof(self, clazz):
         """判断实际对象是否是某个类型的实例"""
-        return isinstance(self.get(), clazz)
+        return isinstance(self.ioc_bean(), clazz)
 
     def primary(self):
         return self._primary

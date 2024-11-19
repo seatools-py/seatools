@@ -17,13 +17,12 @@ class DelayAutowiredClassBeanProxy(BaseBeanProxy):
     def _delay_inject_obj(self):
         from seatools.ioc import get_application_context
         obj = get_application_context().get_bean(name=self._name, cls=self._cls)
-        if self._extra_kwargs.get('required', True):
-            if not obj:
-                raise ValueError(
-                    f'无法注入{("名称[" + self._name + "]") if self._name else ""}{("类型[" + self._cls.__name__ + "]") if self._cls.__name__ else ""}的bean')
+        if self._extra_kwargs.get('required', True) and not obj:
+            raise ValueError(
+                f'无法注入{("名称[" + self._name + "]") if self._name else ""}{("类型[" + self._cls.__name__ + "]") if self._cls.__name__ else ""}的bean')
         return obj
 
-    def get(self):
+    def ioc_bean(self):
         if self._obj is None:
             self._obj = self._delay_inject_obj()
         return self._obj
@@ -59,7 +58,7 @@ class DelayConfigAutowiredClassBeanProxy(BaseBeanProxy):
             return self._extra_kwargs.get('default_value')
         return v
 
-    def get(self):
+    def ioc_bean(self):
         if self._obj is None:
             self._obj = self._delay_inject_obj()
         return self._obj

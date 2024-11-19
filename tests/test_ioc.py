@@ -70,7 +70,7 @@ def test_ioc():
     ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
     context = ioc.get_application_context()
     v = context.get_bean_by_name('intBean')
-    print(v.get())
+    print(v.ioc_bean())
     a = context.get_bean_by_name('a')
     print(a.data())
     b = context.get_bean_by_type(B)
