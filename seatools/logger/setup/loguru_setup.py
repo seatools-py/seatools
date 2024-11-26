@@ -1,3 +1,5 @@
+from typing import Optional
+
 from loguru import logger
 from seatools.logger import setup
 
@@ -9,8 +11,7 @@ def setup_loguru(file_name,
                  diagnose=False,
                  retention="3 days",
                  level='INFO',
-                 service_name='unknown',
-                 label=''):
+                 extra: Optional[dict] = None):
     """设置loguru日志记录.
 
     Args:
@@ -21,10 +22,9 @@ def setup_loguru(file_name,
         diagnose:
         retention:
         level: 日志级别
-        service_name: 服务名称, 业务参数
-        label: 标签, 业务参数
+        extra: 额外信息
     """
-    logger.configure(extra={'service_name': service_name, 'label': label})
+    logger.configure(extra=extra)
     setup(file_name,
           rotation=rotation,
           serialize=serialize,

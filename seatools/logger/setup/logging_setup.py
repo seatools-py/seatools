@@ -1,5 +1,7 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from typing import Optional
+
 from seatools.logger import get_loguru_adapter_logging_formatter
 
 
@@ -10,8 +12,7 @@ def setup_logging(file_name: str,
                   serialize: bool = True,
                   retention_count: int = 3,
                   level: str = 'INFO',
-                  service_name: str = 'unknown',
-                  label=''):
+                  extra: Optional[dict] = None):
     """设置logging日志记录, 与loguru相同的日志格式.
 
     Args:
@@ -22,8 +23,7 @@ def setup_logging(file_name: str,
         serialize: 是否序列化, 仅为True时生效
         retention_count:
         level: 日志级别
-        service_name: 服务名称, 业务参数
-        label: 标签, 业务参数
+        extra: 额外信息
     """
     # 开启序列化则注入
     if serialize:
@@ -38,7 +38,7 @@ def setup_logging(file_name: str,
             encoding='utf-8',
         )
 
-        file_handler.setFormatter(formatter_cls('%(message)s', extra={'service_name': service_name, 'label': label}))
+        file_handler.setFormatter(formatter_cls('%(message)s', extra=extra))
         file_handler.addFilter(lambda e: e.levelno >= logging._nameToLevel[level])
         logging_logger = logging.getLogger(logger_name)
         logging_logger.addHandler(file_handler)

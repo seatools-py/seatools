@@ -1,3 +1,5 @@
+from typing import Optional
+
 from seatools.logger import get_loguru_adapter_logging_formatter
 
 
@@ -7,8 +9,7 @@ def setup_uvicorn(file_name,
                   serialize: bool = True,
                   retention_count: int = 3,
                   level: str = 'INFO',
-                  service_name='unknown',
-                  label=''):
+                  extra: Optional[dict] = None):
     """设置uvicorn文件记录, 与loguru相同的日志格式.
 
     Args:
@@ -18,8 +19,7 @@ def setup_uvicorn(file_name,
         serialize: 是否序列化, 仅为True时生效
         retention_count:
         level: 日志级别
-        service_name: 服务名称, 业务参数
-        label: 标签, 业务参数
+        extra: 额外信息
     """
     from uvicorn.config import LOGGING_CONFIG
     # 修改默认日志格式
@@ -34,7 +34,7 @@ def setup_uvicorn(file_name,
         file_formatter = {
             "()": get_loguru_adapter_logging_formatter(),
             'fmt': '%(message)s',
-            'extra': {'service_name': service_name, 'label': label},
+            'extra': extra or {},
         }
         # 增加一个文件handler
         file_handler = {
