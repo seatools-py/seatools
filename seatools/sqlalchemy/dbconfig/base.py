@@ -1,9 +1,18 @@
 from typing import Optional
+
 from seatools.models import BaseModel
+
+
+class SqlalchemyConfig(BaseModel):
+    """sqlalchemy相关配置"""
+    echo: Optional[bool] = False
+    # 连接池回收周期
+    pool_recycle: Optional[int] = 3600
 
 
 class CommonDBConfig(BaseModel):
     """通用 DB 配置"""
+    name: Optional[str] = None
     host: Optional[str] = None
     port: Optional[int] = None
     user: Optional[str] = None
@@ -15,11 +24,4 @@ class CommonDBConfig(BaseModel):
     is_async: Optional[bool] = False
     # 是否是ioc primary实例
     primary: Optional[bool] = False
-
-
-class SqlalchemyConfig(BaseModel):
-    """sqlalchemy相关配置"""
-    echo: Optional[bool] = False
-    # 连接池回收周期
-    pool_recycle: Optional[int] = 3600
-
+    sqlalchemy: Optional[dict] = None
