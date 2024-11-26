@@ -1,2 +1,2 @@
-from .annotations import Bean
+from .annotations import Bean, ConfigurationPropertiesBean
 from .objects import Autowired, Value
