@@ -79,3 +79,27 @@ def test_ioc():
     print(v == 1)
     c = context.get_bean('c')
     print(c)
+
+
+@ioc.Bean
+class AA:
+
+    def hello(self):
+        print('hello AA')
+
+
+@ioc.Bean
+class BB:
+
+    def __init__(self, aa: AA):
+        self._aa = aa
+
+    def hello(self):
+        self._aa.hello()
+        print('Hello BB')
+
+
+def test_depends():
+    ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
+    b: BB = ioc.Autowired(cls=BB)
+    b.hello()

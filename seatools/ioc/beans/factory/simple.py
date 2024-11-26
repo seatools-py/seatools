@@ -2,12 +2,12 @@ import inspect
 import queue
 from typing import Any, Type, Callable, Union
 
-from seatools.ioc.beans.proxy import *
-from seatools.ioc.utils import class_utils
+from ..proxy import *
+from ...utils import class_utils, name_utils
 from .base import BeanFactory
 from .initializing_bean import InitializingBean
-
-from seatools.ioc.utils.name_utils import to_camel_case
+from ...injects.objects import Autowired
+from ...utils.type_utils import is_basic_type
 
 
 class _Param:
@@ -79,19 +79,45 @@ class SimpleBeanFactory(BeanFactory):
         return self._resolve_bean_from_beans(beans)
 
     def _register_function_bean(self, name: str, func, primary: bool = False) -> Any:
-        name = name or to_camel_case(func.__name__, upper_case=False)
-        proxy = ClassBeanProxy(name=name, obj=func(), primary=primary)
+        name = name or name_utils.to_camel_case(func.__name__, upper_case=False)
+        proxy = ClassBeanProxy(name=name, obj=self._new_function_bean(func), primary=primary)
         self._add_bean(proxy.ioc_name(), proxy.ioc_type(), proxy)
         return proxy
 
     def _register_class_object_bean(self, name, obj, primary: bool = False) -> Any:
-        name = name or to_camel_case(obj.__class__.__name__, upper_case=False)
+        name = name or name_utils.to_camel_case(obj.__class__.__name__, upper_case=False)
         proxy = ClassBeanProxy(name=name, obj=obj, primary=primary)
         self._add_bean(proxy.ioc_name(), proxy.ioc_type(), proxy)
         return proxy
 
     def _register_class_bean(self, name: str, cls, primary: bool = False) -> Any:
-        return self._register_class_object_bean(name, cls(), primary=primary)
+        return self._register_class_object_bean(name, self._new_class_bean(cls), primary=primary)
+
+
+    def _new_class_bean(self, cls) -> Any:
+        params = self._extract_func_enable_autowired_args(cls.__init__)
+        return cls(**params)
+
+    def _new_function_bean(self, func) -> Any:
+        params = self._extract_func_enable_autowired_args(func)
+        return func(**params)
+
+    def _extract_func_enable_autowired_args(self, func) -> dict:
+        """抽取可注入参数."""
+        signature = inspect.signature(func)
+        params = {}
+        for name, parameter in signature.parameters.items():
+            annotation = parameter.annotation
+            default = parameter.default
+            # 默认值不为空 则 不注入参数
+            if default is not parameter.empty:
+                continue
+            # 没有类型 或 是基本类型 则 不注入参数
+            if annotation is parameter.empty or is_basic_type(annotation):
+                continue
+            # 参数通过Autowired基于类型的延迟注入
+            params[name] = Autowired(cls=annotation)
+        return params
 
     def register_bean(self, name: str, cls, primary: bool = False, lazy=True) -> Any:
         # 注册bean懒加载, 在init方法执行bean创建逻辑
