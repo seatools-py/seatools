@@ -6,7 +6,7 @@ from loguru import logger
 
 @Bean
 def init_django():
-    if 'package_name' not in cfg:
+    if 'package_name' not in cfg():
         logger.warning('配置不存在[package_name]属性, 无法自动初始化数django')
         return
     package_name = cfg()['package_name']
