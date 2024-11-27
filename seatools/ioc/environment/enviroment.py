@@ -6,8 +6,6 @@ from seatools.ioc.utils.value_utils import convert
 class Environment:
 
     def get_property(self, name: str, cls: Type = None) -> Any:
-        if not name:
-            raise ValueError('Environment name不能为空')
         data = self._parse_config_value(data=cfg(), config_name_path=name)
         if data is None:
             return None
@@ -16,8 +14,10 @@ class Environment:
         return data
 
     def _parse_config_value(self, data: Dict, config_name_path: str):
-        config_names = config_name_path.split('.')
         current = dict(data)
+        if not config_name_path:
+            return current
+        config_names = config_name_path.split('.')
         for i, config_name in enumerate(config_names):
             if not isinstance(current, dict):
                 return None
