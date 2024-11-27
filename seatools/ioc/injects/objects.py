@@ -1,15 +1,20 @@
+from typing import Any, Type, TypeVar
+
 from seatools.ioc.beans.proxy import DelayAutowiredClassBeanProxy, DelayConfigAutowiredClassBeanProxy
-from seatools.ioc.constants import required
+from seatools.ioc.constants import required as default_required
+
+_T = TypeVar('_T', bound=Any)
 
 
 class Autowired:
     """依赖自动注入"""
 
-    def __new__(_, value: str = None, *, cls=None, required: bool = True):
+    def __new__(_, value: str = None, *, cls: Type[_T]=None, required: bool = True) -> _T:
         """注入对象
 
         Args:
             value: bean name
+            cls: 类型
             required: 是否必须, 为true找不到注入对象会报错
         """
         return DelayAutowiredClassBeanProxy(name=value, obj=cls, required=required)
@@ -19,7 +24,7 @@ class Value:
     """配置自动注入"""
     _cache = {}
 
-    def __new__(_, value: str, *args, cls=None, default_value=required):
+    def __new__(_, value: str, *args, cls: Type[_T]=None, default_value=default_required) -> _T:
         """参数注入
 
         Args:
