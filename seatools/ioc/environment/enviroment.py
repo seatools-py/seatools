@@ -24,6 +24,7 @@ class Environment:
             if '[' in config_name:
                 index_key, index_value = config_name.split('[')
                 index_value = index_value.rstrip(']')
+                index_value = int(index_value)
                 current = current.get(index_key)
                 if current is None:
                     return None

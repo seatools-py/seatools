@@ -23,7 +23,6 @@ class Autowired:
 
 class Value:
     """配置自动注入"""
-    _cache = {}
 
     def __new__(_, value: str, *args, cls: Type[_T]=None, default_value=default_required) -> Union[_T, BasicTypeMixin]:
         """参数注入
