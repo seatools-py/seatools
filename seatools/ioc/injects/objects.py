@@ -1,6 +1,7 @@
-from typing import Any, Type, TypeVar
+from typing import Any, Type, TypeVar, Union
 
 from seatools.ioc.beans.proxy import DelayAutowiredClassBeanProxy, DelayConfigAutowiredClassBeanProxy
+from seatools.ioc.beans.proxy.base import BasicTypeMixin
 from seatools.ioc.constants import required as default_required
 
 _T = TypeVar('_T', bound=Any)
@@ -24,7 +25,7 @@ class Value:
     """配置自动注入"""
     _cache = {}
 
-    def __new__(_, value: str, *args, cls: Type[_T]=None, default_value=default_required) -> _T:
+    def __new__(_, value: str, *args, cls: Type[_T]=None, default_value=default_required) -> Union[_T, BasicTypeMixin]:
         """参数注入
 
         Args:

@@ -4,8 +4,10 @@ import json
 import uuid
 
 from seatools import ioc
+from seatools.ioc import Autowired, Value
 from seatools.ioc.beans.factory import InitializingBean
 from seatools.ioc.config import load_config, cfg
+from seatools.models import BaseModel
 
 
 @ioc.Bean  # 默认name会转为小驼峰 randomUuidFunc
@@ -65,20 +67,29 @@ class C:
         self.c = c
 
 
+class Cp(BaseModel):
+    a: int
+    b: int
+    c: str
+
 def test_ioc():
     # 启动ioc, 扫描当期tests包
     ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
-    context = ioc.get_application_context()
-    v = context.get_bean_by_name('intBean')
-    print(v.ioc_bean())
-    a = context.get_bean_by_name('a')
-    print(a.data())
-    b = context.get_bean_by_type(B)
-    print(b.data())
-    v = context.get_bean_by_type(int)
-    print(v == 1)
-    c = context.get_bean('c')
+    # context = ioc.get_application_context()
+    # v = Autowired('intBean')
+    # print(v)
+    # a = Autowired('a', cls=A)
+    # print(a.data())
+    # b = Autowired(cls=B)
+    # print(b.data())
+    v = Autowired('intBean', cls=int)
+    print(v.int == 1)
+    c = Autowired(cls=C)
     print(c)
+    print(Value('${a}').int)
+    print(Value('${b}').int)
+    c = Value('${c}', cls=Cp)
+    print(c.c)
 
 
 @ioc.Bean

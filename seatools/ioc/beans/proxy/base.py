@@ -2,7 +2,50 @@ import abc
 from typing import Any
 
 
-class BaseBeanProxy(abc.ABC):
+class BasicTypeMixin(abc.ABC):
+    """基本数据类型Mixin."""
+    @property
+    def value(self):
+        raise NotImplementedError()
+
+    @property
+    def int(self):
+        return int(self.value)
+
+    @property
+    def float(self):
+        return float(self.value)
+
+    @property
+    def bool(self):
+        return bool(self.value)
+
+    @property
+    def str(self):
+        return str(self.value)
+
+    @property
+    def list(self):
+        return list(self.value)
+
+    @property
+    def dict(self):
+        return dict(self.value)
+
+    @property
+    def tuple(self):
+        return tuple(self.value)
+
+    @property
+    def set(self):
+        return set(self.value)
+
+    @property
+    def complex(self):
+        return complex(self.value)
+
+
+class BaseBeanProxy(BasicTypeMixin, abc.ABC):
     """基础代理, 未提供代理逻辑实现, 仅提供抽象封装"""
     _exclude_attr = []
 
@@ -49,6 +92,10 @@ class BaseBeanProxy(abc.ABC):
 
     def __repr__(self):
         return self.ioc_bean().__repr__()
+
+    @property
+    def value(self):
+        return self.ioc_bean()
 
 
 class ClassBeanProxy(BaseBeanProxy):
