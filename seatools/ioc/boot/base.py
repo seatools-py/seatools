@@ -1,10 +1,12 @@
 import importlib
+from typing import List, Union
+from threading import RLock
+
+from seatools.ioc.context import ApplicationContext
 from seatools.ioc.utils import reflect_utils
 from seatools.ioc.base import new_bean_factory
 from seatools.ioc.beans.factory import BeanFactory
 from seatools.ioc.config import load_config
-from typing import List, Union
-from threading import RLock
 
 
 class _Properties:
@@ -35,12 +37,18 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
             scan_package_names = [scan_package_names]
         # 初始化工厂
         bean_factory = new_bean_factory(factory=factory)
+
+        # 注册 ApplicationContext
+        bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
+                                   lazy=False)
         # 有配置则初始化配置
         if config_dir:
-            from seatools.ioc.environment import Environment
             load_config(config_dir=config_dir)
-            # 注册environment
-            bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
+
+        # 注册Environment
+        from seatools.ioc.environment import Environment
+        bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
+
         for scan_package_name in scan_package_names:
             # 加载包下所有某个和bean, 并注入到工厂
             modules = reflect_utils.get_all_py_modules(scan_package_name)

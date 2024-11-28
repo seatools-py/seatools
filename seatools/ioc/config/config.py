@@ -7,7 +7,7 @@ import types
 
 
 class _Properties:
-    cfg: Optional[Dict] = None
+    cfg: Optional[Dict] = types.MappingProxyType({})
 
 
 def load_config(config_dir: str):
