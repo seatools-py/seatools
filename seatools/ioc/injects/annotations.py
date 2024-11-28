@@ -25,7 +25,7 @@ def bean(*args, name: str = None, primary=False):
 Bean = bean
 
 
-def configuration_properties_bean(*args, prop: str, name: str = None, primary=False):
+def configuration_properties_bean(*args, prop: str = None, name: str = None, primary=False):
     """配置属性bean. 仅支持pydantic model, dataclass, 同配置的构造函数, 仅支持非必填构造器, 若需要注入的构造参数默认值请使用unique_tools.ioc.Autowired()代替.
 
     Args:
