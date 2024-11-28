@@ -35,7 +35,7 @@ pip install seatools --upgrade
 ### [十二、`seatools.retry` 重试工具](./docs/重试工具.md)
 ### [十三、`seatools.task` 任务工具](./docs/任务工具.md)
 ### [十四、`seatools.cache` 缓存工具](./docs/缓存工具.md)
-### [十五、`seatools.ioc` 轻量级ioc工具](./docs/ioc工具.md)
+### [十五、`seatools.ioc` 轻量级ioc工具](./docs/ioc工具.md), [ioc详解](./docs/ioc详解.md)
 ### [十六、`seatools.id` ID工具](./docs/ID工具.md)
 ### [十七、`seatools.redis_om` redis-om拓展](./docs/redis-om拓展.md)
 ### [十七、`seatools.uc` undetected-chromedriver拓展工具](./docs/undetected-chromedriver拓展工具.md)
