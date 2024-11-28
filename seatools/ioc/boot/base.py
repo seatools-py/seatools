@@ -49,6 +49,9 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
         from seatools.ioc.environment import Environment
         bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
 
+        # 添加starters包优先自动加载
+        scan_package_names = ['seatools.ioc.starters'] + scan_package_names
+
         for scan_package_name in scan_package_names:
             # 加载包下所有某个和bean, 并注入到工厂
             modules = reflect_utils.get_all_py_modules(scan_package_name)
