@@ -1,5 +1,6 @@
 import inspect
 
+from seatools.utils import list_utils
 from seatools.ioc.base import _register_bean
 from seatools.ioc.utils.name_utils import to_camel_case
 
@@ -20,6 +21,9 @@ def bean(*args, name: str = None, primary=False):
 
     if len(args) == 1 and (inspect.isclass(args[0]) or inspect.isfunction(args[0])):
         return wrapper(args[0])
+
+    name = list_utils.get(args, 0, name)
+    primary = list_utils.get(args, 1, primary)
     return wrapper
 
 
@@ -54,6 +58,10 @@ def configuration_properties_bean(*args, prop: str = None, name: str = None, pri
 
     if len(args) == 1 and (inspect.isclass(args[0]) or inspect.isfunction(args[0])):
         return wrapper(args[0])
+
+    prop = list_utils.get(args, 0, prop)
+    name = list_utils.get(args, 1, name)
+    primary = list_utils.get(args, 2, primary)
     return wrapper
 
 

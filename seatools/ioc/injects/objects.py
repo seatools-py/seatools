@@ -28,7 +28,7 @@ class Value:
         """参数注入
 
         Args:
-            value: 配置名称, 多级使用.分隔, 示例: xxx.xxx
+            value: 配置名称, 必须使用${}包裹, 多级使用.分隔, 示例: ${xxx.xxx}
             cls: value读取数据的类型, 如果为None则返回环境变量中的值
             default_value: 默认值, 若不传则表示必须有配置值
         """

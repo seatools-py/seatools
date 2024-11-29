@@ -5,6 +5,7 @@ from typing import Optional
 import inspect
 from contextvars import ContextVar
 
+from seatools.utils import list_utils
 from seatools.ioc import Autowired
 from seatools.sqlalchemy import SqlAlchemyClient, AsyncSqlAlchemyClient
 
@@ -113,6 +114,9 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
     if len(args) == 1 and (inspect.isclass(args[0]) or inspect.isfunction(args[0])):
         return wrapper(args[0])
 
+    db = list_utils.get(args, 0, db)
+    field_name = list_utils.get(args, 1, field_name)
+
     return wrapper
 
 
@@ -180,5 +184,8 @@ def new_session(*args, db: Optional[str] = None, field_name: Optional[str] = 'se
 
     if len(args) == 1 and (inspect.isclass(args[0]) or inspect.isfunction(args[0])):
         return wrapper(args[0])
+
+    db = list_utils.get(args, 0, db)
+    field_name = list_utils.get(args, 1, field_name)
 
     return wrapper
