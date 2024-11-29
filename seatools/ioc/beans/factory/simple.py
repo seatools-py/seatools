@@ -1,6 +1,7 @@
 import inspect
 import queue
-from typing import Any, Type, Callable, Union
+import importlib
+from typing import Any, Type, Callable, Union, Optional, List, Dict
 
 from ..proxy import *
 from ...utils import class_utils, name_utils
@@ -102,8 +103,8 @@ class SimpleBeanFactory(BeanFactory):
         params = self._extract_func_enable_autowired_args(func)
         return func(**params)
 
-    def _extract_func_enable_autowired_args(self, func) -> dict:
-        """抽取可注入参数."""
+    def _extract_fun_depends_args(self, func) -> dict:
+        """抽取函数依赖参数信息."""
         signature = inspect.signature(func)
         params = {}
         for name, parameter in signature.parameters.items():
@@ -115,8 +116,22 @@ class SimpleBeanFactory(BeanFactory):
             # 没有类型 或 是基本类型 则 不注入参数
             if annotation is parameter.empty or is_basic_type(annotation):
                 continue
-            # 参数通过Autowired基于类型的延迟注入
-            params[name] = Autowired(cls=annotation)
+            # 参数名称和类型映射
+            # 非字符串类型则直接返回类型
+            if not isinstance(annotation, str):
+                params[name] = annotation
+            else:
+                # 动态加载类型
+                params[name] = getattr(importlib.import_module(inspect.getmodule(func).__name__), annotation)
+
+        return params
+
+    def _extract_func_enable_autowired_args(self, func) -> dict:
+        """抽取函数可注入参数."""
+        params = self._extract_fun_depends_args(func)
+        if params:
+            for name, cls in params.items():
+                params[name] = Autowired(cls=cls)
         return params
 
     def register_bean(self, name: str, cls, primary: bool = False, lazy=True) -> Any:
@@ -153,22 +168,68 @@ class SimpleBeanFactory(BeanFactory):
                         bean.after_properties_set()
 
     def _create_beans(self):
+        depends = []
+        # 优先创建无依赖的bean
         while True:
             try:
                 param: _Param = self._init_queue.get(block=False)
                 # 没有依赖则可以直接注册bean
-                if not self._has_dependency(param):
+                depends_params = self._get_depends_args(param)
+                if not depends_params:
                     self._register_bean(param.name, param.cls, param.primary)
                     continue
-                # todo: 依赖处理策略
+                # 依赖入队列
+                depends.append({'param': param, 'depends': depends_params})
             except queue.Empty:
                 break
 
-    def _has_dependency(self, param: _Param) -> bool:
+        if not depends:
+            return
+        # 创建依赖bean
+        self._create_depends_beans(depends)
+
+    def _create_depends_beans(self, depends: List[Dict[str, Any]]):
+        # 处理非循环依赖
+        while True:
+            end = True
+            next_depends = []
+            for dep in depends:
+                params = {}
+                for name, cls in dep['depends'].items():
+                    # 获取依赖bean实例
+                    obj = self.get_bean(name=name, required_type=cls) or self.get_bean(required_type=cls)
+                    # 依赖bean不存在则跳过处理下一个
+                    if obj is None:
+                        break
+                    params[name] = obj
+                # 获取的依赖数量与目标一致则可以创建bean
+                if len(params) == len(dep['depends']):
+                    self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary)
+                    end = False
+                else:
+                    next_depends.append(dep)
+            depends = next_depends
+            # 没有需要解决的普通依赖就退出
+            if end:
+                break
+
+        if not depends:
+            return
+
+        # 处理循环依赖
+        for dep in depends:
+            self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary)
+
+    def _get_depends_args(self, param: _Param) -> Optional[dict]:
         """判断要创建的bean是否存在依赖
         """
-        # todo: 逻辑待实现
-        return False
+        name, cls, primary = param.name, param.cls, param.primary
+        if inspect.isfunction(cls):
+            return self._extract_fun_depends_args(cls.__init__)
+        if inspect.isclass(cls):
+            return self._extract_fun_depends_args(cls)
+        # 对象注入无需依赖
+        return None
 
     def _add_bean(self, name: str, _type, bean: Any):
         self._add_name_bean(name, bean)

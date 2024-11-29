@@ -1,6 +1,7 @@
 import inspect
 
 from seatools.ioc.base import _register_bean
+from seatools.ioc.utils.name_utils import to_camel_case
 
 
 def bean(*args, name: str = None, primary=False):
@@ -47,7 +48,7 @@ def configuration_properties_bean(*args, prop: str = None, name: str = None, pri
             e: Environment = get_environment()
             return e.get_property(prop, fc)
 
-        _register_bean(name=name, cls=lazy_register_bean, primary=primary)
+        _register_bean(name=name or to_camel_case(fc.__name__, False), cls=lazy_register_bean, primary=primary)
         fc.__bean__ = True
         return fc
 
