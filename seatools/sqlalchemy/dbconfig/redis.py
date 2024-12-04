@@ -7,4 +7,4 @@ class RedisConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 6379
     user: Optional[str] = ''
-    orm_schema: Optional[str] = 'redis'
+    driver: Optional[str] = 'redis'

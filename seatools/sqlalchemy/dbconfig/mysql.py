@@ -7,7 +7,7 @@ class MysqlConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 3306
     user: Optional[str] = 'root'
-    orm_schema: Optional[str] = 'mysql+pymysql'
+    driver: Optional[str] = 'mysql+pymysql'
 
 
 class AsyncMysqlConfig(CommonDBConfig):
@@ -15,5 +15,5 @@ class AsyncMysqlConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 3306
     user: Optional[str] = 'root'
-    orm_schema: Optional[str] = 'mysql+aiomysql'
+    driver: Optional[str] = 'mysql+aiomysql'
     is_async: Optional[bool] = True

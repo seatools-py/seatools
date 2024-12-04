@@ -9,7 +9,8 @@ REDIS_TYPE = TypeVar('REDIS_TYPE', bound='redis.Redis')
 _DEFAULT_SQLALCHEMY_CONFIG = SqlalchemyConfig(echo=True, pool_recycle=3600)
 
 
-def new_client(_id: CommonDBConfig, config: Optional[Union[SqlalchemyConfig, dict]] = None) -> Union[SqlAlchemyClient, AsyncSqlAlchemyClient, REDIS_TYPE]:
+def new_client(_id: CommonDBConfig, config: Optional[Union[SqlalchemyConfig, dict]] = None) -> Union[
+    SqlAlchemyClient, AsyncSqlAlchemyClient, REDIS_TYPE]:
     """DB客户端创建工具, 可通过通用DB配置对象创建 SqlAlchemyClient, AsyncSqlAlchemyClient, redis.Redis 实例.
 
     Args:
@@ -26,13 +27,13 @@ def new_client(_id: CommonDBConfig, config: Optional[Union[SqlalchemyConfig, dic
     if client:
         return client
     # 支持 redis 获取 redis.Redis 连接对象
-    if db_config.orm_schema == 'redis':
+    if db_config.driver == 'redis':
         return __new_redis_client(db_config, _id)
     return __new_sqlalchemy_client(db_config, _id, config or _DEFAULT_SQLALCHEMY_CONFIG)
 
 
 def __gen_sqlalchemy_url(config: CommonDBConfig):
-    return URL.create(config.orm_schema,
+    return URL.create(config.driver,
                       host=config.host,
                       port=config.port,
                       username=config.user,
@@ -55,15 +56,15 @@ def __new_redis_client(config: CommonDBConfig, _id: str) -> REDIS_TYPE:
         return client
 
 
-
-def __new_sqlalchemy_client(config: CommonDBConfig, _id: str, db_config: Union[SqlalchemyConfig, dict]) -> Union[SqlAlchemyClient, AsyncSqlAlchemyClient]:
+def __new_sqlalchemy_client(config: CommonDBConfig, _id: str, db_config: Union[SqlalchemyConfig, dict]) -> Union[
+    SqlAlchemyClient, AsyncSqlAlchemyClient]:
     url = __gen_sqlalchemy_url(config)
     logger.info('初始化ID[{}]的SqlAlchemyClient, 连接串[{}]', _id, url)
     client_cls = AsyncSqlAlchemyClient if config.is_async else SqlAlchemyClient
     if isinstance(db_config, SqlalchemyConfig):
         db_config = db_config.model_dump(mode='json')
     # hive 需要额外处理
-    if config.orm_schema == 'hive':
+    if config.driver == 'hive':
         try:
             from pyhive import hive
         except ImportError as e:

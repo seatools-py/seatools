@@ -19,7 +19,7 @@ class CommonDBConfig(BaseModel):
     password: Optional[str] = None
     db: Optional[str] = None
     # sqlalchemy的schema, 仅使用sqlalchemy需要配置, 例如:sqlite, mysql+pymysql等等
-    orm_schema: Optional[str] = None
+    driver: Optional[str] = None
     # 是否是async连接
     is_async: Optional[bool] = False
     # 是否是ioc primary实例

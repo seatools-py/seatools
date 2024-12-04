@@ -7,7 +7,7 @@ class PostgresqlConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 5432
     user: Optional[str] = 'root'
-    orm_schema: Optional[str] = 'postgresql+psycopg2'
+    driver: Optional[str] = 'postgresql+psycopg2'
 
 
 class AsyncPostgresqlConfig(CommonDBConfig):
@@ -15,5 +15,5 @@ class AsyncPostgresqlConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 5432
     user: Optional[str] = 'root'
-    orm_schema: Optional[str] = 'postgresql+asyncpg'
+    driver: Optional[str] = 'postgresql+asyncpg'
     is_async: Optional[bool] = True

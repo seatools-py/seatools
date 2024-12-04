@@ -7,4 +7,4 @@ class ClickhouseConfig(CommonDBConfig):
     host: Optional[str] = '127.0.0.1'
     port: Optional[int] = 8123
     user: Optional[str] = 'root'
-    orm_schema: Optional[str] = 'clickhouse'
+    driver: Optional[str] = 'clickhouse'
