@@ -4,7 +4,7 @@ import importlib
 from typing import Any, Type, Callable, Union, Optional, List, Dict
 
 from ..proxy import *
-from ...utils import class_utils, name_utils
+from ...utils import name_utils
 from .base import BeanFactory
 from .initializing_bean import InitializingBean
 from ...injects.objects import Autowired
@@ -63,7 +63,7 @@ class SimpleBeanFactory(BeanFactory):
                 return bean
             # 同类型的未找到再找父类
             bean = self._resolve_bean_from_beans(
-                [bean for bean in beans if class_utils.is_family_type(bean.ioc_type(), required_type)])
+                [bean for bean in beans if issubclass(bean.ioc_type(), required_type)])
             if bean:
                 return bean
             return None
@@ -75,7 +75,7 @@ class SimpleBeanFactory(BeanFactory):
         if not beans:
             beans = []
             for _type in self._type_bean.keys():
-                if class_utils.is_family_type(_type, required_type):
+                if issubclass(_type, required_type):
                     beans = [*beans, *self._type_bean[_type]]
         return self._resolve_bean_from_beans(beans)
 
