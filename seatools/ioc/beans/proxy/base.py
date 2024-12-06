@@ -87,6 +87,21 @@ class BaseBeanProxy(BasicTypeMixin, abc.ABC):
             return attr
         return object.__getattribute__(self, item)
 
+    def __setitem__(self, key, value):
+        return self.ioc_bean().__setitem__(key, value)
+
+    def __getitem__(self, item):
+        return self.ioc_bean().__getitem__(item)
+
+    def __delitem__(self, key):
+        return self.ioc_bean().__delitem__(key)
+
+    def __delattr__(self, item):
+        return self.ioc_bean().__delattr__(item)
+
+    def __eq__(self, other):
+        return self.ioc_bean().__eq__(other)
+
     def __call__(self, *args, **kwargs):
         return self.ioc_bean()(*args, **kwargs)
 
