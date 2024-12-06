@@ -1,3 +1,6 @@
+import re
+from pathlib import Path
+
 from seatools.env import get_env
 from seatools.files import AutoDataFileLoader
 from typing import Optional, Dict
@@ -11,13 +14,16 @@ class _Properties:
 
 
 def load_config(config_dir: str):
-    """仅加载`config_dir`中的application.yml, application-dev.yml, application-test.yml, application-pro.yml
+    """仅加载`config_dir`中的application.[yml|yaml|json|properties|xml], application-dev.[yml|yaml|json|properties|xml], application-test.[yml|yaml|json|properties|xml], application-pro.[yml|yaml|json|properties|xml]
     :param config_dir: 项目目录地址
     """
     # 当前项目的配置文件
-    config_file_path = config_dir + os.sep + f'application.yml'
+    config_file_path = _find_file_path(config_dir, '^application.(yml|yaml|json|properties|xml)$') or (
+            config_dir + os.sep + 'application.yml')
     # 多环境配置文件
-    env_config_file_path = config_dir + os.sep + f'application-{get_env().name}.yml'
+    env_config_file_path = _find_file_path(config_dir,
+                                           f'^application-{get_env().name}.(yml|yaml|json|properties|xml)$') or (
+                                   config_dir + os.sep + f'application-{get_env().name}.yml')
     exist_config_file_path, exist_env_config_file_path = os.path.exists(config_file_path), os.path.exists(
         env_config_file_path)
     _data_file_loader = AutoDataFileLoader()
@@ -54,3 +60,12 @@ def cfg() -> Optional[Dict]:
         配置对象
     """
     return _Properties.cfg
+
+
+def _find_file_path(config_dir: str, pattern: str) -> Optional[str]:
+    """查找符合条件的文件路径, 如果匹配仅返回一个"""
+    files = [f for f in Path(config_dir).iterdir() if f.is_file()]
+    for file in files:
+        if re.match(pattern, file.name):
+            return config_dir + os.sep + file.name
+    return None
