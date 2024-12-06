@@ -96,7 +96,7 @@ class SimpleBeanFactory(BeanFactory):
 
 
     def _new_class_bean(self, cls) -> Any:
-        params = self._extract_func_enable_autowired_args(cls.__init__)
+        params = self._extract_func_enable_autowired_args(cls)
         return cls(**params)
 
     def _new_function_bean(self, func) -> Any:
@@ -125,6 +125,11 @@ class SimpleBeanFactory(BeanFactory):
                 params[name] = getattr(importlib.import_module(inspect.getmodule(func).__name__), annotation)
 
         return params
+
+    def _extract_class_attr_depends_args(self, cls) -> dict:
+        """抽取类属性依赖参数信息."""
+        members = [member for member in inspect.getmembers(cls) if issubclass(type(member[-1]), BaseBeanProxy)]
+        return {member[0]: member[-1].ioc_type() for member in members}
 
     def _extract_func_enable_autowired_args(self, func) -> dict:
         """抽取函数可注入参数."""
@@ -225,7 +230,11 @@ class SimpleBeanFactory(BeanFactory):
         """
         name, cls, primary = param.name, param.cls, param.primary
         if inspect.isfunction(cls):
-            return self._extract_fun_depends_args(cls.__init__)
+            # 属性Autowired依赖
+            args = self._extract_class_attr_depends_args(cls)
+            # 构造函数依赖
+            args.update(self._extract_fun_depends_args(cls))
+            return args
         if inspect.isclass(cls):
             return self._extract_fun_depends_args(cls)
         # 对象注入无需依赖
