@@ -9,6 +9,7 @@
 1. https://github.com/seatools-py/cookiecutter-seatools-python
 2. https://gitee.com/seatools-py/cookiecutter-seatools-python
 
+启动器列表地址具体见：[https://gitee.com/seatools-py](https://gitee.com/seatools-py)
 
 ## 该仓库设立初衷旨在针对各业务场景提供更编辑的操作方式, 并且任意工具均可按需安装依赖, 使得程序更轻量
 
