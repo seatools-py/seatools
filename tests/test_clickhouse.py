@@ -1,3 +1,4 @@
+import pytest
 from seatools.models import BaseModel
 from seatools.clickhouse.clickhouse_driver import ClickhouseDriverClient
 from loguru import logger
@@ -18,6 +19,7 @@ def get_client():
     )
 
 
+@pytest.mark.skip()
 def test_clickhouse_driver():
     client = get_client()
     client.execute('insert into test_python_tbl(`id`, `name`) values(1, \'测试名称\')')

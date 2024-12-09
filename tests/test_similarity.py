@@ -1,3 +1,5 @@
+import pytest
+
 from seatools.algorithm.similarity import cos_similarity
 from loguru import logger
 
@@ -13,5 +15,6 @@ def test_cos_similarity():
     logger.success(cos_similarity(a, d))
     logger.success(cos_similarity(b, d))
     logger.success(cos_similarity(c, d))
-    logger.error(cos_similarity([0, 1], [0, 0, 0]))
+    with pytest.raises(ValueError):
+        logger.error(cos_similarity([0, 1], [0, 0, 0]))
 

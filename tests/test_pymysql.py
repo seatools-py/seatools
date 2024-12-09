@@ -3,6 +3,9 @@ import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+
+import pytest
+
 from seatools.mysql import pymysql
 from seatools.models import BaseModel
 from typing import Optional
@@ -41,6 +44,7 @@ def save(conn: pymysql.Connection, sql):
         traceback.print_exc()
 
 
+@pytest.mark.skip()
 def test_pymysql():
     conn = pymysql.connect(
         host='localhost',
@@ -55,6 +59,7 @@ def test_pymysql():
         """)
 
 
+@pytest.mark.skip()
 def test_pymysql_helper():
     client = pymysql.PyMysqlClient(
         host='localhost',

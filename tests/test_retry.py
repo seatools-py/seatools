@@ -1,5 +1,7 @@
 import asyncio
 
+import pytest
+
 from seatools.retry import Retry, AsyncRetry
 from loguru import logger
 
@@ -66,7 +68,8 @@ def test_async_retry():
                               ever_fail_level='WARNING',  # 每次任务失败记录的日志级别(未达到重试上限),
                               fail_level='ERROR',  # 任务重试达到失败上限的日志级别
                               )
-    asyncio.run(_async_retry.do(test, 3))
+    with pytest.raises(Exception):
+        asyncio.run(_async_retry.do(test, 3))
 
 
 @GLOBAL_ASYNC_RETRY.retry

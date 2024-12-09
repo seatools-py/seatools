@@ -1,8 +1,11 @@
+import pytest
+
 from seatools.notices import SmtpEmailNotice, FeishuRobotNotice, FeishuRobotTextMsg, FeishuRobotPostMsg, \
     FeishuRobotCardMsg, FeishuRobotCardMsgTemplate
 from seatools.builders import HtmlBuilder
 
 
+@pytest.mark.skip()
 def test_smtp_email_notice():
     notice = SmtpEmailNotice(smtp_server='smtp.feishu.cn',
                              smtp_port=465,
@@ -17,6 +20,7 @@ def test_smtp_email_notice():
                       attachments=[__file__])
 
 
+@pytest.mark.skip()
 def test_feishu_robot_notice():
     notice = FeishuRobotNotice('xxx',
                                'xxxx')

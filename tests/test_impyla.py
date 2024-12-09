@@ -1,3 +1,4 @@
+import pytest
 from seatools.impala.impyla import ImpylaClient
 from loguru import logger
 from seatools.models import BaseModel
@@ -13,6 +14,7 @@ class TestModel(BaseModel):
     update_time: Optional[datetime.datetime] = None
 
 
+@pytest.mark.skip()
 def test_impyla():
     client = ImpylaClient(host='localhost', port=21050,
                           user='root',
