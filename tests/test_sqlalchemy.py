@@ -22,7 +22,7 @@ class UserModel(BaseModel):
 
 
 def get_helper():
-    return SqlAlchemyClient('sqlite:///example.db', echo=True)
+    return SqlAlchemyClient('sqlite:///tmp/example.db', echo=True)
 
 
 def test_create_model():
@@ -57,7 +57,7 @@ def test_delete():
 
 
 async def test_async_engine():
-    helper = AsyncSqlAlchemyClient('sqlite+aiosqlite:///example.db', echo=True)
+    helper = AsyncSqlAlchemyClient('sqlite+aiosqlite:///tmp/example.db', echo=True)
     async with helper.session() as session:
         session.add(User(id=1, name='测试用户1', create_time=datetime.datetime.now()))
         users = (await session.execute(select(User).where(User.id >= 1))).scalars().all()

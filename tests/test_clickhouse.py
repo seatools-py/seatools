@@ -1,7 +1,6 @@
 from seatools.models import BaseModel
 from seatools.clickhouse.clickhouse_driver import ClickhouseDriverClient
 from loguru import logger
-from typing import Optional
 
 
 class TestPythonTblModel(BaseModel):
