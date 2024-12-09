@@ -17,7 +17,7 @@ def test_log_catch():
 
 
 def test_logging():
-    filer_handler = logging.FileHandler('demo.log', encoding='utf-8')
+    filer_handler = logging.FileHandler('tmp/demo.log', encoding='utf-8')
     filer_handler.setLevel(logging.DEBUG)
     filer_handler.setFormatter(get_loguru_adapter_logging_formatter()())
 
