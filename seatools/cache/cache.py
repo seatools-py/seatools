@@ -1,3 +1,4 @@
+import asyncio
 import re
 from cachetools import Cache as _Cache
 import inspect
@@ -155,6 +156,20 @@ class Cache(_BaseCache):
                 self.put(_key, data)
                 return data
 
+            async def async_wrapper(*args, **kwargs):
+                _key = self._gen_key(func, key, *args, **kwargs)
+                data = self._cache.get(_key)
+                if data is not None:
+                    data = self._unwrapper_data(data)
+                    self._debug_msg('获取缓存key[{}], 值: {}', _key, data)
+                    return data
+                data = await func(*args, **kwargs)
+                self.put(_key, data)
+                return data
+
+            if asyncio.iscoroutinefunction(func):
+                return async_wrapper
+
             return wrapper
 
         return wrapper_func
@@ -180,6 +195,15 @@ class Cache(_BaseCache):
                 data = func(*args, **kwargs)
                 self.put(_key, data)
                 return data
+
+            async def async_wrapper(*args, **kwargs):
+                _key = self._gen_key(func, key, *args, **kwargs)
+                data = await func(*args, **kwargs)
+                self.put(_key, data)
+                return data
+
+            if asyncio.iscoroutinefunction(func):
+                return async_wrapper
 
             return wrapper
 
@@ -208,6 +232,14 @@ class Cache(_BaseCache):
                 _key = self._gen_key(func, key, *args, **kwargs)
                 self.evict(_key, default=None)
                 return func(*args, **kwargs)
+
+            async def async_wrapper(*args, **kwargs):
+                _key = self._gen_key(func, key, *args, **kwargs)
+                self.evict(_key, default=None)
+                return await func(*args, **kwargs)
+
+            if asyncio.iscoroutinefunction(func):
+                return async_wrapper
 
             return wrapper
 
