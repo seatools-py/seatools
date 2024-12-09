@@ -10,8 +10,8 @@ Model = TypeVar("Model", bound="RedisModel")
 class HashModel(BaseModel, _HashModel):
 
     def save(
-        self: "Model", pipeline: Optional[redis.client.Pipeline] = None
-    ) -> "Model":
+        self: Model, pipeline: Optional[redis.client.Pipeline] = None
+    ) -> Model:
         self.check()
         db = self._get_db(pipeline)
         document = self.model_dump(mode='json')

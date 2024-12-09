@@ -1,8 +1,10 @@
+from typing import Tuple
+
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import pad, unpad
 
 
-def encrypt_aes(data, key, *args, **kwargs):
+def encrypt_aes(data: bytes, key: bytes, *args, **kwargs) -> Tuple[bytes, bytes]:
     """AES 加密
 
     Args:
@@ -18,7 +20,7 @@ def encrypt_aes(data, key, *args, **kwargs):
     return ciphertext, iv
 
 
-def decrypt_aes(ciphertext, key, iv, *args, **kwargs) -> bytes:
+def decrypt_aes(ciphertext: bytes, key: bytes, iv: bytes=None, *args, **kwargs) -> bytes:
     """AES 解密
 
     Args:

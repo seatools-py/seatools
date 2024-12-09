@@ -2,7 +2,9 @@ import math
 from typing import Union, List
 
 
-def cos_similarity(a: Union[float, List[float]], b: Union[float, List[float]], normalized: bool = False) -> float:
+def cos_similarity(a: Union[float, int, List[Union[float, int]]],
+                   b: Union[float, int, List[Union[float, int]]],
+                   normalized: bool = False) -> float:
     """余弦相似度计算, 支持皮尔逊相关系数
 
     Args:
@@ -10,7 +12,7 @@ def cos_similarity(a: Union[float, List[float]], b: Union[float, List[float]], n
         b: 计算的元素或列表
         normalized: 是否标准化处理, Ture=是, False=否, 标准化处理变为皮尔逊相关系数
     """
-    if isinstance(a, float) and isinstance(b, float):
+    if isinstance(a, (float, int)) and isinstance(b, (float, int)):
         if a * b == 0:
             return 0
         return a * b / (abs(a) * abs(b))

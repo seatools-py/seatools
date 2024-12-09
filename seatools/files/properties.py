@@ -14,8 +14,10 @@ def _load_properties_data(config_data: str):
 
     properties = {}
     for line in config_data.split('\n'):
-        if not line.strip() or line.startswith('#') or '=' not in line:
+        if not line.strip() or line.startswith('#'):
             continue
+        if '=' not in line:
+            raise ValueError('properties文件格式错误, 每一行必须包含"=".')
         key, value = line.split('=', 1)
         key, value = key.strip(), value.strip()
         keys = key.split(".")
