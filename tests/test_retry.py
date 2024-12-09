@@ -57,6 +57,7 @@ def test_retry2():
     fail3_wrapper(1, 2)
 
 
+@pytest.mark.skip()
 async def test(a: int):
     raise Exception(f'异常{a}')
 

@@ -18,7 +18,6 @@ class UserModel(BaseModel):
     id: int
     name: str
     create_time:datetime.datetime
-    lalala: str
 
 
 def get_helper():
