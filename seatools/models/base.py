@@ -79,11 +79,11 @@ class PageModel(BaseModel):
     # 分页数据记录列表
     rows: Optional[List[Any]] = Field([], title='分页数据记录列表')
     # 当前页码
-    page: Optional[int] = Field(..., title='当前页码')
+    page: Optional[int] = Field(1, title='当前页码')
     # 当前页大写
-    page_size: Optional[int] = Field(..., title='当前页大小')
+    page_size: Optional[int] = Field(10, title='当前页大小')
     # 记录总数
-    total: Optional[int] = Field(..., title='记录总数')
+    total: Optional[int] = Field(0, title='记录总数')
 
 
 class PageR(R):
