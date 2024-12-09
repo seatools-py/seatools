@@ -141,7 +141,7 @@ class BaseMapper:
               group_conds: Optional[Union[List[_SQLHavingOperations], _SQLHavingOperations]] = None,
               offset: Optional[int] = None,
               limit: Optional[int] = None,
-              query: Optional[_SQLSelectOperations] = None,
+              fields: Optional[_SQLSelectOperations] = None,
               result: Literal[
                   'scalar', 'scalars', 'list', 'scalars-list', 'first', 'scalars-first', 'one_or_none', 'scalars-one_or_none', 'one', 'scalars-one', None] = 'scalars-list',
               **kwargs) -> Union[ScalarResult[_BASE], Sequence[_BASE], _BASE, None, Any]:
@@ -155,13 +155,13 @@ class BaseMapper:
             group_conds: 分组条件, 对应 sql having
             offset: offset
             limit: limit
-            query: 查询内容, 为 None 默认查询表所有字段, 允许传数据表属性字段及列表, 允许传递sqlalchemy.func函数及函数列表
+            fields: 查询内容, 为 None 默认查询表所有字段, 允许传数据表属性字段及列表, 允许传递sqlalchemy.func函数及函数列表
             result: 返回数据形式, 默认 scalars_list, 各类型见源码
 
         Returns:
             ScalarResult或者List
         """
-        q = _gen_model_query_select(query if query is not None else self.__tableclass__,
+        q = _gen_model_query_select(fields if fields is not None else self.__tableclass__,
                                     conds=conds,
                                     orders=orders,
                                     groups=groups,
@@ -284,7 +284,7 @@ class AsyncBaseMapper:
                     group_conds: Optional[Union[List[_SQLHavingOperations], _SQLHavingOperations]] = None,
                     offset: Optional[int] = None,
                     limit: Optional[int] = None,
-                    query: Optional[_SQLSelectOperations] = None,
+                    fields: Optional[_SQLSelectOperations] = None,
                     result: Literal[
                         'scalar', 'scalars', 'list', 'scalars-list', 'first', 'scalars-first', 'one_or_none', 'scalars-one_or_none', 'one', 'scalars-one', None] = 'scalars-list',
                     **kwargs) -> Union[ScalarResult[_BASE], Sequence[_BASE], _BASE, None, Any]:
@@ -298,13 +298,13 @@ class AsyncBaseMapper:
             group_conds: 分组条件
             offset: offset
             limit: limit
-            query: 查询内容, 为 None 默认查询表所有字段, 允许传数据表属性字段及列表, 允许传递sqlalchemy.func函数及函数列表
+            fields: 查询内容, 为 None 默认查询表所有字段, 允许传数据表属性字段及列表, 允许传递sqlalchemy.func函数及函数列表
             result: 返回数据形式, 默认 scalars_list, 各类型见源码
 
         Returns:
             ScalarResult或者List
         """
-        q = _gen_model_query_select(query if query is not None else self.__tableclass__,
+        q = _gen_model_query_select(fields if fields is not None else self.__tableclass__,
                                     conds=conds,
                                     orders=orders,
                                     groups=groups,
