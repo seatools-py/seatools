@@ -50,6 +50,8 @@ def __new_redis_client(config: CommonDBConfig, _id: str) -> REDIS_TYPE:
         return client
     except ImportError:
         import redis
+        if config.password and config.user is None:
+            config.user = ''
         url = __gen_sqlalchemy_url(config).render_as_string(hide_password=False)
         client = redis.Redis.from_url(url, **{'decode_responses': True})
         __db_map[_id] = client
