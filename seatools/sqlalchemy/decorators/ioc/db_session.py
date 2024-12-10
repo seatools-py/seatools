@@ -78,15 +78,9 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
             if cli.ioc_bean():
                 async with cli.session() as session:
                     return await do_async_func(func, session=session, *args, **kwargs)
-            cli = Autowired(db, cls=SqlAlchemyClient, required=False)
-            if cli.ioc_bean():
-                with cli.session() as session:
-                    return await do_async_func(func, session=session, *args, **kwargs)
-
-            # redis
-            import redis
-            cli = Autowired(db, cls=redis.Redis)
-            return await do_async_func(func, session=cli, *args, **kwargs)
+            cli = Autowired(db, cls=SqlAlchemyClient)
+            with cli.session() as session:
+                return await do_async_func(func, session=session, *args, **kwargs)
 
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
@@ -97,15 +91,9 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
             if session:
                 kwargs[field_name] = session
                 return func(*args, **kwargs)
-            cli = Autowired(db, cls=SqlAlchemyClient, required=False)
-            if cli.ioc_bean():
-                with cli.session() as session:
-                    return do_func(func, session=session, *args, **kwargs)
-
-            # redis
-            import redis
-            cli = Autowired(db, cls=redis.Redis)
-            return do_func(func, session=cli, *args, **kwargs)
+            cli = Autowired(db, cls=SqlAlchemyClient)
+            with cli.session() as session:
+                return do_func(func, session=session, *args, **kwargs)
 
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
@@ -152,31 +140,19 @@ def new_session(*args, db: Optional[str] = None, field_name: Optional[str] = 'se
                 async with cli.session() as session:
                     kwargs[field_name] = session
                     return await func(*args, **kwargs)
-            cli = Autowired(db, cls=SqlAlchemyClient, required=False)
-            if cli.ioc_bean():
-                with cli.session() as session:
-                    kwargs[field_name] = session
-                    return await func(*args, **kwargs)
-
-            # redis
-            import redis
-            cli = Autowired(db, cls=redis.Redis)
-            return await func(func, session=cli, *args, **kwargs)
+            cli = Autowired(db, cls=SqlAlchemyClient)
+            with cli.session() as session:
+                kwargs[field_name] = session
+                return await func(*args, **kwargs)
 
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
             if kwargs.get(field_name):
                 return func(*args, **kwargs)
-            cli = Autowired(db, cls=SqlAlchemyClient, required=False)
-            if cli.ioc_bean():
-                with cli.session() as session:
-                    kwargs[field_name] = session
-                    return func(*args, **kwargs)
-
-            # redis
-            import redis
-            cli = Autowired(db, cls=redis.Redis)
-            return func(func, session=cli, *args, **kwargs)
+            cli = Autowired(db, cls=SqlAlchemyClient)
+            with cli.session() as session:
+                kwargs[field_name] = session
+                return func(*args, **kwargs)
 
         if asyncio.iscoroutinefunction(func):
             return async_wrapper

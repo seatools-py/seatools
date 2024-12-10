@@ -26,9 +26,6 @@ def new_client(_id: CommonDBConfig, config: Optional[Union[SqlalchemyConfig, dic
     client = __db_map.get(_id)
     if client:
         return client
-    # 支持 redis 获取 redis.Redis 连接对象
-    if db_config.driver == 'redis':
-        return __new_redis_client(db_config, _id)
     return __new_sqlalchemy_client(db_config, _id, config or _DEFAULT_SQLALCHEMY_CONFIG)
 
 
@@ -39,23 +36,6 @@ def __gen_sqlalchemy_url(config: CommonDBConfig):
                       username=config.user,
                       password=config.password,
                       database=config.db)
-
-
-def __new_redis_client(config: CommonDBConfig, _id: str) -> REDIS_TYPE:
-    try:
-        # 优先使用redis-om
-        from unique_tools.redis_om import get_redis_connection
-        client = get_redis_connection(url=__gen_sqlalchemy_url(config).render_as_string(hide_password=False))
-        __db_map[_id] = client
-        return client
-    except ImportError:
-        import redis
-        if config.password and config.user is None:
-            config.user = ''
-        url = __gen_sqlalchemy_url(config).render_as_string(hide_password=False)
-        client = redis.Redis.from_url(url, **{'decode_responses': True})
-        __db_map[_id] = client
-        return client
 
 
 def __new_sqlalchemy_client(config: CommonDBConfig, _id: str, db_config: Union[SqlalchemyConfig, dict]) -> Union[
