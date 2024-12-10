@@ -8,3 +8,4 @@ uvicorn[standard]>=0.29.0
 redis-om>=0.3.2
 undetected-chromedriver>=3.5.5
 cachetools>=5.3.0
+redis
