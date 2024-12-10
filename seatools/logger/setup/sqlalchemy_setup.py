@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from .logging_setup import setup_logging
@@ -11,6 +12,7 @@ def setup_sqlalchemy(file_name,
                      level: str = 'INFO',
                      extra: Optional[dict] = None):
     """设置sqlalchemy日志记录, 与loguru相同的日志格式."""
+    warnings.warn('Deprecated.', DeprecationWarning)
     setup_logging(file_name=file_name,
                   logger_name='sqlalchemy',
                   rotation_type=rotation_type,

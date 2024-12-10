@@ -1,3 +1,4 @@
+import warnings
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from typing import Optional
@@ -25,6 +26,7 @@ def setup_logging(file_name: str,
         level: 日志级别
         extra: 额外信息
     """
+    warnings.warn('Deprecated.', DeprecationWarning)
     # 开启序列化则注入
     if serialize:
         # 增加一个适配loguru序列化的日志格式化器

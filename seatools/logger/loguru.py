@@ -1,3 +1,5 @@
+import warnings
+
 from loguru import logger
 
 
@@ -39,6 +41,7 @@ def setup(file_name,
             ERROR: 表示错误，但程序仍然可以继续执行
             CRITICAL: 表示严重错误，可能导致程序无法继续执行
     """
+    warnings.warn('Deprecated.', DeprecationWarning)
     # 添加文件配置
     logger.add(file_name,
                format="{message}",

@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from seatools.logger import get_loguru_adapter_logging_formatter
@@ -21,6 +22,7 @@ def setup_uvicorn(file_name,
         level: 日志级别
         extra: 额外信息
     """
+    warnings.warn('Deprecated.', DeprecationWarning)
     from uvicorn.config import LOGGING_CONFIG
     # 修改默认日志格式
     LOGGING_CONFIG['formatters']['default'][

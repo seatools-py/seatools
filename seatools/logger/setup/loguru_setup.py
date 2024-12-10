@@ -1,3 +1,4 @@
+import warnings
 from typing import Optional
 
 from loguru import logger
@@ -24,6 +25,7 @@ def setup_loguru(file_name,
         level: 日志级别
         extra: 额外信息
     """
+    warnings.warn('Deprecated.', DeprecationWarning)
     logger.configure(extra=extra)
     setup(file_name,
           rotation=rotation,
