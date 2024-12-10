@@ -35,7 +35,7 @@ def __gen_sqlalchemy_url(config: CommonDBConfig):
                       port=config.port,
                       username=config.user,
                       password=config.password,
-                      database=config.db)
+                      database=config.database or config.db)
 
 
 def __new_sqlalchemy_client(config: CommonDBConfig, _id: str, db_config: Union[SqlalchemyConfig, dict]) -> Union[
@@ -54,7 +54,7 @@ def __new_sqlalchemy_client(config: CommonDBConfig, _id: str, db_config: Union[S
             raise e
         client = client_cls(url=url,
                             creator=lambda: hive.Connection(
-                                host=config.host, port=config.port, username=config.user, database=config.db
+                                host=config.host, port=config.port, username=config.user, database=config.database or config.db
                             ), **db_config)
     else:
         client = client_cls(url=url, **db_config)
