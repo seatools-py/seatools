@@ -44,7 +44,7 @@ setup(
                 'thrift-sasl', 'pycryptodome>=3.20.0'],
     },
     license="MIT license",
-    long_description=readme,
+    long_description='',
     include_package_data=True,
     keywords='seatools',
     name='seatools',
@@ -52,6 +52,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://gitee.com/dragons96/seatools',
-    version='1.0.20',
+    version='1.0.21',
     zip_safe=False,
 )
