@@ -26,6 +26,10 @@ def new_bean_factory(factory=None):
     return _BeanVars.bean_factory
 
 
+def get_bean_factory():
+    return _BeanVars.bean_factory
+
+
 def get_application_context() -> ApplicationContext:
     if _BeanVars.application_context:
         return _BeanVars.application_context

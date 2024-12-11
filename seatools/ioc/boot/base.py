@@ -4,14 +4,15 @@ from threading import RLock
 
 from seatools.ioc.context import ApplicationContext
 from seatools.ioc.utils import reflect_utils
-from seatools.ioc.base import new_bean_factory
+from seatools.ioc.base import new_bean_factory, get_bean_factory
 from seatools.ioc.beans.factory import BeanFactory
 from seatools.ioc.config import load_config
 
 
 class _Properties:
-    running: int = 0
+    first = True
     lock = RLock()
+    loaded_modules = set()
 
 
 def run(scan_package_names: Union[List[str], str], config_dir: str = None, factory: BeanFactory = None,
@@ -27,44 +28,58 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
     """
     # 启动加锁
     with _Properties.lock:
-        if _Properties.running:
-            return
-        # 启动, 设置运行状态
-        _Properties.running = 1
         if not scan_package_names:
             raise ValueError('包名不能为空')
         if isinstance(scan_package_names, str):
             scan_package_names = [scan_package_names]
         # 初始化工厂
-        bean_factory = new_bean_factory(factory=factory)
+        if _Properties.first:
+            bean_factory = new_bean_factory(factory=factory)
+            # 有配置则初始化配置
+            if config_dir:
+                load_config(config_dir=config_dir)
 
-        # 有配置则初始化配置
-        if config_dir:
-            load_config(config_dir=config_dir)
+            # 注册Environment
+            from seatools.ioc.environment import Environment
+            bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
 
-        # 注册Environment
-        from seatools.ioc.environment import Environment
-        bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
+            # 注册 ApplicationContext
+            bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
+                                       lazy=False)
 
-        # 注册 ApplicationContext
-        bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
-                                   lazy=False)
+            # 添加starters包优先自动加载
+            scan_package_names = ['seatools.ioc.starters'] + scan_package_names
 
-        # 添加starters包优先自动加载
-        scan_package_names = ['seatools.ioc.starters'] + scan_package_names
+            _Properties.first = False
+        else:
+            bean_factory = get_bean_factory()
 
         for scan_package_name in scan_package_names:
             # 加载包下所有某个和bean, 并注入到工厂
             modules = reflect_utils.get_all_py_modules(scan_package_name)
             for module in modules:
                 if not exclude_modules:
-                    importlib.import_module(module)
+                    _load_module(module)
                     continue
                 for exclude_module in exclude_modules:
                     if module.startswith(exclude_module):
                         break
                 else:
-                    importlib.import_module(module)
+                    _load_module(module)
         # 初始化创建bean实例
         bean_factory.init()
+        # 释放加载资源
+        _release()
 
+
+def _release():
+    # 释放资源
+    _Properties.loaded_modules.clear()
+
+
+def _load_module(module):
+    if module in _Properties.loaded_modules:
+        return
+    # 防止出现递归无限加载, 优先放入记录再加载
+    _Properties.loaded_modules.add(module)
+    importlib.import_module(module)
