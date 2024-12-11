@@ -12,6 +12,7 @@ import types
 
 class _Properties:
     cfg: Optional[Dict] = types.MappingProxyType({})
+    express_pattern = re.compile(r'\$\{(.*?)\}')
 
 
 def load_config(config_dir: str):
@@ -87,8 +88,7 @@ def _parse_cfg_list(cfg_dict: dict, scan_cfg_list: Union[list, tuple]):
 def _parse_cfg_dict_value(cfg_dict: dict, value):
     if not isinstance(value, str):
         return value
-    pattern = r'\$\{(.*?)\}'
-    expresses = list(set(re.findall(pattern, value)))
+    expresses = list(set(_Properties.express_pattern.findall(value)))
     if not expresses:
         return value
     if len(expresses) == 1 and '${' + expresses[0] + '}' == value:
