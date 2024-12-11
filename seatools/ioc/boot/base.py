@@ -57,9 +57,14 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
             # 加载包下所有某个和bean, 并注入到工厂
             modules = reflect_utils.get_all_py_modules(scan_package_name)
             for module in modules:
-                if exclude_modules and module in exclude_modules:
+                if not exclude_modules:
+                    importlib.import_module(module)
                     continue
-                importlib.import_module(module)
+                for exclude_module in exclude_modules:
+                    if module.startswith(exclude_module):
+                        break
+                else:
+                    importlib.import_module(module)
         # 初始化创建bean实例
         bean_factory.init()
 
