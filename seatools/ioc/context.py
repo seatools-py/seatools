@@ -1,3 +1,4 @@
+from seatools.ioc.environment import Environment
 from seatools.ioc.beans.factory import BeanFactory
 from typing import Any
 
@@ -19,6 +20,9 @@ class ApplicationContext:
         if self._bean_factory:
             return self._bean_factory.get_bean(name=name, required_type=cls)
         return None
+
+    def get_environment(self) -> Environment:
+        return self._bean_factory.get_bean('environment', required_type=Environment)
 
     def get_bean_by_name(self, name: str):
         """通过名称获取bean

@@ -1,9 +1,12 @@
-from typing import Type, Dict, Any
+from typing import Type, Dict, Any, List
 from seatools.ioc.config import cfg
 from seatools.ioc.utils.value_utils import convert
 
 
 class Environment:
+
+    def __init__(self):
+        self._active_profiles = None
 
     def get_property(self, name: str, cls: Type = None) -> Any:
         data = self._parse_config_value(data=cfg(), config_name_path=name)
@@ -12,6 +15,15 @@ class Environment:
         if cls:
             return convert(data, cls)
         return data
+
+    def get_active_profiles(self) -> List[str]:
+        if not self._active_profiles:
+            active_profiles = self.get_property("seatools.profiles.active")
+            if not active_profiles:
+                self._active_profiles = []
+            else:
+                self._active_profiles = [active_profile.strip() for active_profile in active_profiles.split(',')]
+        return self._active_profiles
 
     def _parse_config_value(self, data: Dict, config_name_path: str):
         current = dict(data)

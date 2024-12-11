@@ -1,7 +1,6 @@
 import re
 from pathlib import Path
 
-from seatools.env import get_env
 from seatools.files import AutoDataFileLoader
 from typing import Optional, Dict
 from loguru import logger
@@ -20,12 +19,14 @@ def load_config(config_dir: str):
     # 当前项目的配置文件
     config_file_path = _find_file_path(config_dir, '^application.(yml|yaml|json|properties|xml)$') or (
             config_dir + os.sep + 'application.yml')
-    # 多环境配置文件
-    env_config_file_path = _find_file_path(config_dir,
-                                           f'^application-{get_env().name}.(yml|yaml|json|properties|xml)$') or (
-                                   config_dir + os.sep + f'application-{get_env().name}.yml')
-    exist_config_file_path, exist_env_config_file_path = os.path.exists(config_file_path), os.path.exists(
-        env_config_file_path)
+    # 使用 active
+    actives = set()
+    custom_env = os.getenv('ENV')
+    if custom_env:
+        actives.add(custom_env)
+
+    exist_config_file_path  = os.path.exists(config_file_path)
+
     _data_file_loader = AutoDataFileLoader()
     # 配置对象_cfg
     _cfg_dict = {}
@@ -33,11 +34,19 @@ def load_config(config_dir: str):
         _cfg_dict = _merge_config(_cfg_dict, _data_file_loader.load_file(config_file_path,
                                                                          encoding='utf-8'))
         logger.info('加载[{}]配置文件', config_file_path)
-    if exist_env_config_file_path:
-        _cfg_dict = _merge_config(_cfg_dict, _data_file_loader.load_file(env_config_file_path,
+    config_actives = ((_cfg_dict.get('seatools') or {}).get('profiles') or {}).get('active')
+    if config_actives:
+        actives = {*[config_active.strip() for config_active in config_actives.split(',')], *actives}
+    for active in actives:
+        active_config_file_path = _find_file_path(config_dir, f'^application-{active}.(yml|yaml|json|properties|xml)$')
+        if not active_config_file_path:
+            continue
+        if not os.path.exists(active_config_file_path):
+            continue
+        _cfg_dict = _merge_config(_cfg_dict, _data_file_loader.load_file(active_config_file_path,
                                                                          encoding='utf-8'))
-        logger.info('加载[{}]配置文件', env_config_file_path)
-    # 转为不可读配置信息
+        logger.info('加载[{}]配置文件', active_config_file_path)
+    # 转为不可修改配置信息
     _Properties.cfg = types.MappingProxyType(_cfg_dict)
 
 

@@ -38,9 +38,6 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
         # 初始化工厂
         bean_factory = new_bean_factory(factory=factory)
 
-        # 注册 ApplicationContext
-        bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
-                                   lazy=False)
         # 有配置则初始化配置
         if config_dir:
             load_config(config_dir=config_dir)
@@ -48,6 +45,10 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
         # 注册Environment
         from seatools.ioc.environment import Environment
         bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
+
+        # 注册 ApplicationContext
+        bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
+                                   lazy=False)
 
         # 添加starters包优先自动加载
         scan_package_names = ['seatools.ioc.starters'] + scan_package_names

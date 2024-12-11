@@ -1,4 +1,5 @@
 import os
+import warnings
 from enum import Enum
 from loguru import logger as log
 
@@ -36,6 +37,7 @@ def get_env() -> EnvEnum:
     Returns:
         EnvEnum 环境枚举对象
     """
+    warnings.warn("Deprecated.", DeprecationWarning)
     global _env
     if _env:
         return _env
