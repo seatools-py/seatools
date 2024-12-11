@@ -1,3 +1,6 @@
 b: 2
 c:
   c: as
+
+search_url: '${api_url}/search${b}'
+api_url: '${url}/api'

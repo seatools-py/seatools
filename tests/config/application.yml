@@ -6,3 +6,5 @@ a: 1
 seatools:
   profiles:
     active: dev, dev2
+
+url: https://www.baidu.com

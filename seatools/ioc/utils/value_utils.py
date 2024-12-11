@@ -4,6 +4,60 @@ from pydantic import BaseModel
 import inspect
 
 
+def parse_express_set_value(data: dict, express: str, value):
+    if not express:
+        return
+    current = data
+    config_names = express.split('.')
+    for i, config_name in enumerate(config_names):
+        if not isinstance(current, dict):
+            return None
+        if '[' in config_name and ']' in config_name:
+            index_key, index_value = config_name.split('[')
+            index_value = index_value.rstrip(']')
+            index_value = int(index_value)
+            current = current.get(index_key)
+            if current is None:
+                return None
+            if not isinstance(current, (tuple, list)):
+                return None
+            if index_value >= len(current):
+                return None
+            if i == len(config_names) - 1:
+                current[index_value] = value
+            else:
+                current = current[index_value]
+        else:
+            if i == len(config_names) - 1:
+                current[config_name] = value
+            else:
+                current = current.get(config_name)
+
+
+def parse_express_value(data: dict, express: str):
+    current = dict(data)
+    if not express:
+        return current
+    config_names = express.split('.')
+    for i, config_name in enumerate(config_names):
+        if not isinstance(current, dict):
+            return None
+        if '[' in config_name and ']' in config_name:
+            index_key, index_value = config_name.split('[')
+            index_value = index_value.rstrip(']')
+            index_value = int(index_value)
+            current = current.get(index_key)
+            if current is None:
+                return None
+            if not isinstance(current, (tuple, list)):
+                return None
+            if index_value >= len(current):
+                return None
+            current = current[index_value]
+        else:
+            current = current.get(config_name)
+    return current
+
 def convert(value: Any, _type: Type) -> Any:
     """将对象转为特定类型"""
     if value is None:
@@ -17,6 +71,7 @@ def convert(value: Any, _type: Type) -> Any:
         if issubclass(_type, BaseModel) or getattr(_type, '__dataclass_fields__', None) is not None:
             return _type(**value)
         return _new_model(value, _type)
+    raise ValueError('value type error')
 
 
 def _new_model(data: Dict, model_class) -> Any:
