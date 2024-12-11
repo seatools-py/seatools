@@ -21,9 +21,6 @@ def load_config(config_dir: str):
             config_dir + os.sep + 'application.yml')
     # 使用 active
     actives = set()
-    custom_env = os.getenv('ENV')
-    if custom_env:
-        actives.add(custom_env)
 
     exist_config_file_path  = os.path.exists(config_file_path)
 
@@ -34,9 +31,16 @@ def load_config(config_dir: str):
         _cfg_dict = _merge_config(_cfg_dict, _data_file_loader.load_file(config_file_path,
                                                                          encoding='utf-8'))
         logger.info('加载[{}]配置文件', config_file_path)
-    config_actives = ((_cfg_dict.get('seatools') or {}).get('profiles') or {}).get('active')
-    if config_actives:
-        actives = {*[config_active.strip() for config_active in config_actives.split(',')], *actives}
+
+    # 优先级 env('ENV') > env('seatools.profiles.active') > application.yml('seatools.profiles.active')
+    custom_env = os.getenv('ENV')
+    if custom_env:
+        actives.add(custom_env)
+    else:
+        config_actives = os.getenv ('seatools.profiles.active', ((_cfg_dict.get('seatools') or {}).get('profiles') or {}).get('active'))
+        if config_actives:
+            actives = {*[config_active.strip() for config_active in config_actives.split(',')]}
+
     for active in actives:
         active_config_file_path = _find_file_path(config_dir, f'^application-{active}.(yml|yaml|json|properties|xml)$')
         if not active_config_file_path:
@@ -46,6 +50,7 @@ def load_config(config_dir: str):
         _cfg_dict = _merge_config(_cfg_dict, _data_file_loader.load_file(active_config_file_path,
                                                                          encoding='utf-8'))
         logger.info('加载[{}]配置文件', active_config_file_path)
+
     # 转为不可修改配置信息
     _Properties.cfg = types.MappingProxyType(_cfg_dict)
 
