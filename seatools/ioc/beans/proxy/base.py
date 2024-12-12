@@ -6,7 +6,7 @@ class BasicTypeMixin(abc.ABC):
     """基本数据类型Mixin."""
     @property
     def value(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     @property
     def int(self):

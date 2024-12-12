@@ -37,7 +37,7 @@ class Task(ABC):
             args: 任务参数
             kwargs: 任务参数
         """
-        raise NotImplemented('任务逻辑未实现')
+        raise NotImplementedError
 
     @abstractmethod
     def _task_name(self) -> str:
@@ -46,7 +46,7 @@ class Task(ABC):
         Returns:
             任务名称
         """
-        raise NotImplemented('任务名称未实现')
+        raise NotImplementedError
 
     def _gen_task_id(self):
         return str(uuid.uuid4())
@@ -69,7 +69,7 @@ class AsyncTask(ABC):
         Returns:
             任务名称
         """
-        raise NotImplemented('任务名称未实现')
+        raise NotImplementedError
 
     def _gen_task_id(self):
         return str(uuid.uuid4())
@@ -96,4 +96,4 @@ class AsyncTask(ABC):
             args: 任务参数
             kwargs: 任务参数
         """
-        raise NotImplemented('任务逻辑未实现')
+        raise NotImplementedError

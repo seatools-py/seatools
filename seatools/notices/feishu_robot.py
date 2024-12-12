@@ -11,7 +11,7 @@ import re
 class _FeishuRobotBaseMsg(BaseModel):
 
     def get_msg_type(self):
-        raise NotImplementedError()
+        raise NotImplementedError
 
     def to_json(self):
         return self.model_dump(exclude_none=True)

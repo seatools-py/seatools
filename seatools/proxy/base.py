@@ -63,7 +63,7 @@ class ProxyPool(ABC):
         Returns:
             代理过期状态, true=已过期, false=未过期
         """
-        raise NotImplemented('未实现检查代理是否过期方法')
+        raise NotImplementedError
 
     def release(self, proxy_id: str):
         """释放一个代理, 将代理归还入池
@@ -81,7 +81,7 @@ class ProxyPool(ABC):
         Returns:
             代理信息
         """
-        raise NotImplemented('未实现生成代理方法')
+        raise NotImplementedError
 
 
 class ProxyManager:
