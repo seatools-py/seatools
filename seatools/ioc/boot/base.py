@@ -2,6 +2,8 @@ import importlib
 from typing import List, Union
 from threading import RLock
 
+from loguru import logger
+
 from seatools.ioc.context import ApplicationContext
 from seatools.ioc.utils import reflect_utils
 from seatools.ioc.base import new_bean_factory, get_bean_factory
@@ -82,4 +84,7 @@ def _load_module(module):
         return
     # 防止出现递归无限加载, 优先放入记录再加载
     _Properties.loaded_modules.add(module)
-    importlib.import_module(module)
+    try:
+        importlib.import_module(module)
+    except ModuleNotFoundError:
+        logger.warning('Module {} not found.Cannot to import by seatools.ioc'.format(module))
