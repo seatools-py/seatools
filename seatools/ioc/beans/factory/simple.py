@@ -31,6 +31,7 @@ class SimpleBeanFactory(BeanFactory):
         self._init_queue = queue.Queue()
         self._dependency_map = {}
         self._register_class_object_bean(name=self.__class__.__name__, obj=self)
+        self._initialized = False
 
     def get_bean(self, name: str = None, required_type: Union[Type, Callable] = None) -> Any:
         if not name and not required_type:
@@ -141,7 +142,7 @@ class SimpleBeanFactory(BeanFactory):
 
     def register_bean(self, name: str, cls, primary: bool = False, lazy=True) -> Any:
         # 注册bean懒加载, 在init方法执行bean创建逻辑
-        if lazy:
+        if lazy and not self._initialized:
             self._init_queue.put(_Param(name, cls, primary))
         else:
             self._register_bean(name, cls, primary)
@@ -160,6 +161,7 @@ class SimpleBeanFactory(BeanFactory):
         self._create_beans()
         # 初始化
         self._do_beans_init()
+        self._initialized = True
 
     def _do_beans_init(self):
         # 对所有容器执行__post_construct__, InitializingBean.after_properties_set 初始化方法
