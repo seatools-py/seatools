@@ -98,7 +98,7 @@ from seatools.ioc import run
 run(scan_package_names='xxx', config_dir='config') # 其中scan_package_names参数支持字符串, 字符串列表, 按顺序扫描包
 ```
 
-2. `seatools.ioc.Bean` - `decorator`: ioc 容器装饰器, 支持装饰类型, 方法，类似 Java Spring 的 `@Bean`，使用示例如下：
+2. `seatools.ioc.Bean` - `decorator`: ioc 容器装饰器, 支持装饰[类型, 方法]，类似 Java Spring 的 `@Bean`，使用示例如下：
 ```python
 from seatools.ioc import run, Bean
 
@@ -181,7 +181,7 @@ print(b.str + 'aa')
 """
 
 # Value也允许直接装配Model
-from seatools.models import BaseModel:
+from seatools.models import BaseModel
 
 class C(BaseModel):
     a: int
@@ -266,10 +266,10 @@ from seatools.ioc.beans.factory import InitializingBean
 @Bean
 class A(InitializingBean):
 
-   def after_properties_set():
+    def after_properties_set(self):
        print('initializaing A')
 
-    def hello():
+    def hello(self):
         print('hello A')
 
 
@@ -295,6 +295,7 @@ c:
   a: 2
   b: y
 """
+from seatools.models import BaseModel
 from seatools.ioc import run, Autowired, Bean, ConfigurationPropertiesBean
 
 
@@ -331,8 +332,10 @@ xxx_service.print()
 
 
 
-## APIs 列表
-### [一. `seatools.logger` 日志工具包(通过setup方法设置日志文件+loguru框架记录日志)](./docs/日志工具包.md)
+## 核心 APIs 列表
+### [一、`seatools.ioc` 轻量级ioc工具](./docs/ioc工具.md), [ioc详解](./docs/ioc详解.md)
+
+## 工具 APIs 列表
 ### [二. `seatools.builders` 特定格式内容建造器, 例如: html标签, markdown语法等](./docs/Html、Markdown建造器.md)
 ### [三. `seatools.files` 文件/文件类型数据处理工具, 例如: json, csv, yaml, ini等](./docs/文件或文件类型数据处理工具.md)
 ### [四. `seatools.models` pydantic Model 封装等, 墙裂推荐, 业务上均应该使用pydantic](./docs/pydantic封装.md)
@@ -343,6 +346,6 @@ xxx_service.print()
 ### [九、`seatools.retry` 重试工具](./docs/重试工具.md)
 ### [十、`seatools.task` 任务工具](./docs/任务工具.md)
 ### [十一、`seatools.cache` 缓存工具](./docs/缓存工具.md)
-### [十二、`seatools.ioc` 轻量级ioc工具](./docs/ioc工具.md), [ioc详解](./docs/ioc详解.md)
+### [十二. `seatools.logger` 日志工具包(通过setup方法设置日志文件+loguru框架记录日志)](./docs/日志工具包.md)
 ### [十三、`seatools.redis_om` redis-om拓展](./docs/redis-om拓展.md)
 ### [十四、`seatools.uc` undetected-chromedriver拓展工具](./docs/undetected-chromedriver拓展工具.md)
