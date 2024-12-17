@@ -30,7 +30,7 @@ class SimpleBeanFactory(BeanFactory):
         self._type_bean = {}
         self._init_queue = queue.Queue()
         self._dependency_map = {}
-        self._register_class_object_bean(name=self.__class__.__name__, obj=self)
+        self._register_class_object_bean(name='simpleBeanFactory', obj=self)
         self._initialized = False
 
     def get_bean(self, name: str = None, required_type: Union[Type, Callable] = None) -> Any:
