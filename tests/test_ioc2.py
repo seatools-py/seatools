@@ -27,7 +27,7 @@ class XXXBService(XXXAService):
 """
 xxx/config.py
 """
-from seatools.ioc import Bean
+from seatools.ioc import Bean, ApplicationContext
 
 
 @Bean(primary=True)
@@ -45,11 +45,23 @@ xxx/main.py
 """
 from seatools.ioc import run, Autowired
 
-def test_ioc():
+
+def start():
     # 启动ioc依赖
     run(scan_package_names='tests.test_ioc2', config_dir='./config')
+
+def test_ioc():
+    start()
     xxxa = Autowired(
         cls=XXXService)  # 由于XXXService有XXXAService和XXXBService两个子类, 并且均定义了IOC容器实例, 当仅传递类型时, 会自动扫描获取primary=True的Bean返回
     xxxa.do_anything()  # 输出：XXXA
     xxxb = Autowired('xxxb', cls=XXXService)  # 通过名称+类型获取 XXXBService IOC 容器实例
     xxxb.do_anything()  # 输出：XXXB
+
+
+def test_ioc_beans():
+    start()
+    ctx = Autowired(cls=ApplicationContext)
+    beans = ctx.get_beans(XXXService)
+    for bean in beans:
+        bean.do_anything()

@@ -1,7 +1,7 @@
 import inspect
 import queue
 import importlib
-from typing import Any, Type, Callable, Union, Optional, List, Dict
+from typing import Any, Type, Callable, Union, Optional, List, Dict, TypeVar
 
 from ..proxy import *
 from ...utils import name_utils
@@ -9,6 +9,8 @@ from .base import BeanFactory
 from .initializing_bean import InitializingBean
 from ...injects.objects import Autowired
 from ...utils.type_utils import is_basic_type
+
+_T = TypeVar('_T', bound=Any)
 
 
 class _Param:
@@ -39,6 +41,9 @@ class SimpleBeanFactory(BeanFactory):
         if name:
             return self._resolve_name_bean(name, required_type)
         return self._resolve_type_bean(required_type)
+
+    def get_beans(self, required_type: Type[_T]) -> List[_T]:
+        return [*(self._resolve_type_beans(required_type))]
 
     def _resolve_bean_from_beans(self, beans):
         if len(beans) >= 2:
@@ -72,13 +77,17 @@ class SimpleBeanFactory(BeanFactory):
         return self._resolve_bean_from_beans(beans)
 
     def _resolve_type_bean(self, required_type=None):
+        beans = self._resolve_type_beans(required_type=required_type)
+        return self._resolve_bean_from_beans(beans)
+
+    def _resolve_type_beans(self, required_type=None):
         beans = self._type_bean.get(required_type)
         if not beans:
             beans = []
             for _type in self._type_bean.keys():
                 if issubclass(_type, required_type):
                     beans = [*beans, *self._type_bean[_type]]
-        return self._resolve_bean_from_beans(beans)
+        return beans
 
     def _register_function_bean(self, name: str, func, primary: bool = False) -> Any:
         name = name or name_utils.to_camel_case(func.__name__, upper_case=False)
