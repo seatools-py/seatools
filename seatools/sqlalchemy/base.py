@@ -91,7 +91,9 @@ class Base(DeclarativeBase):
 class SqlAlchemyClient:
     """SqlAlchemy工具客户端"""
 
-    def __init__(self, url: str, echo: bool = False, **kwargs: Any):
+    def __init__(self, url: str, echo: bool = False,
+                 session_cls = Session,
+                 **kwargs: Any):
         """创建sqlalchemy工具客户端
 
         Args:
@@ -102,10 +104,10 @@ class SqlAlchemyClient:
             echo: The echo=True parameter indicates that SQL emitted by connections will be logged to standard out.
         """
         self._engine = create_engine(url, echo=echo, **kwargs)
-        self._session_maker = sessionmaker(bind=self._engine, expire_on_commit=False)
+        self._session_maker = sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @contextmanager
-    def session(self) -> Session:
+    def session(self, **kw) -> Session:
         """获取session上下文对象
 
         使用示例:
@@ -114,7 +116,7 @@ class SqlAlchemyClient:
                 session.execute()
                 session.get()
         """
-        session = self._session_maker()
+        session = self._session_maker(**kw)
         try:
             yield session
             session.commit()
@@ -133,7 +135,9 @@ class SqlAlchemyClient:
 class AsyncSqlAlchemyClient:
     """SqlAlchemy异步工具客户端"""
 
-    def __init__(self, url: str, echo: bool = False, **kwargs: Any):
+    def __init__(self, url: str, echo: bool = False,
+                 session_cls = AsyncSession,
+                 **kwargs: Any):
         """创建sqlalchemy异步工具客户端
 
         Args:
@@ -144,10 +148,10 @@ class AsyncSqlAlchemyClient:
             echo: The echo=True parameter indicates that SQL emitted by connections will be logged to standard out.
         """
         self._engine = create_async_engine(url, echo=echo, **kwargs)
-        self._session_maker = async_sessionmaker(bind=self._engine)
+        self._session_maker = async_sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @asynccontextmanager
-    async def session(self) -> AsyncSession:
+    async def session(self, **kw) -> AsyncSession:
         """获取session上下文对象
 
         使用示例:
@@ -156,7 +160,7 @@ class AsyncSqlAlchemyClient:
                 session.execute()
                 session.get()
         """
-        session = self._session_maker()
+        session = self._session_maker(**kw)
         try:
             yield session
             await session.commit()
