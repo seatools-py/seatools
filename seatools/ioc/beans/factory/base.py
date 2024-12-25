@@ -15,7 +15,7 @@ class BeanFactory(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def register_bean(self, name: str, cls, primary: bool = False, **kwargs) -> Any:
+    def register_bean(self, name: str, cls, primary: bool = False, order: int = 0, **kwargs) -> Any:
         """bean注册方法."""
         raise NotImplementedError
 

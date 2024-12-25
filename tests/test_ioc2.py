@@ -65,3 +65,25 @@ def test_ioc_beans():
     beans = ctx.get_beans(XXXService)
     for bean in beans:
         bean.do_anything()
+
+
+@Bean(order=1)
+class A:
+
+    def hello(self):
+        print("hello A")
+
+
+@Bean(order=0)
+class B:
+
+    def hello(self):
+        print("hello B")
+
+def test_ioc_order():
+    start()
+    a = Autowired(cls=A)
+    b = Autowired(cls=B)
+    a.hello()
+    b.hello()
+

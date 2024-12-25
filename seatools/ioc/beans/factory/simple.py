@@ -23,6 +23,9 @@ class _Param:
         self.cls = cls
         self.primary = primary
 
+    def __lt__(self, other):
+        return False
+
 
 class SimpleBeanFactory(BeanFactory):
     """简单bean工厂"""
@@ -30,7 +33,7 @@ class SimpleBeanFactory(BeanFactory):
     def __init__(self):
         self._name_bean = {}
         self._type_bean = {}
-        self._init_queue = queue.Queue()
+        self._init_queue = queue.PriorityQueue()
         self._dependency_map = {}
         self._register_class_object_bean(name='simpleBeanFactory', obj=self)
         self._initialized = False
@@ -156,10 +159,10 @@ class SimpleBeanFactory(BeanFactory):
                 params[name] = Autowired(value=name_params.get(name), cls=cls)
         return params
 
-    def register_bean(self, name: str, cls, primary: bool = False, lazy=True) -> Any:
+    def register_bean(self, name: str, cls, primary: bool = False, order: int = 0, lazy=True) -> Any:
         # 注册bean懒加载, 在init方法执行bean创建逻辑
         if lazy and not self._initialized:
-            self._init_queue.put(_Param(name, cls, primary))
+            self._init_queue.put((order, _Param(name, cls, primary)))
         else:
             self._register_bean(name, cls, primary)
 
@@ -195,7 +198,7 @@ class SimpleBeanFactory(BeanFactory):
         # 优先创建无依赖的bean
         while True:
             try:
-                param: _Param = self._init_queue.get(block=False)
+                order, param = self._init_queue.get(block=False)
                 # 没有依赖则可以直接注册bean
                 depends_params, depends_name_params = self._get_depends_args(param)
                 if not depends_params:
