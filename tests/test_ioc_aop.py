@@ -24,6 +24,9 @@ class A:
     def hello_error(self):
         raise RuntimeError
 
+    def _hello_protected(self, name):
+        print(f"hello A {name}")
+
 
 @Aspect(order=100)
 class AAop(AbstractAspect):
@@ -75,7 +78,8 @@ class A2Aop(AbstractAspect):
 def test_ioc_aop_success():
     start()
     a = Autowired(cls=A)
-    a.hello("lalala")
+    a.hello("lala")
+    # a._hello_protected("lalala")
 
 
 def test_ioc_aop_return():
