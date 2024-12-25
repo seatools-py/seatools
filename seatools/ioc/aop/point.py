@@ -4,6 +4,14 @@ from typing import Any, Tuple, Dict
 class JoinPoint:
 
     def __init__(self, path, instance, method_name, args: Tuple[Any, ...], kwargs: Dict[str, Any]):
+        """
+        Args:
+           path: pointcut module-class-method path. example: xxx.xxx.xxx.XxxClass.xxx_method
+           instance: pointcut proxy instance
+           method_name: pointcut method name
+           args: pointcut method args
+           kwargs: pointcut method kwargs
+        """
         self.instance = instance
         self.method_name = method_name
         self.method = getattr(instance, method_name)
@@ -16,3 +24,20 @@ class JoinPoint:
         """do point process."""
         self.return_value = self.method(*self.args, **self.kwargs)
         return self.return_value
+
+    def get_arg(self, index = None, field_name = None):
+        """Get index arg or filed_name arg. Not contains self. Note: index and field_name cannot be empty at the same time.
+
+        Args:
+            index: get index base on args
+            field_name: get field name base on kwargs
+        """
+        if len(self.args) > index:
+            return
+        assert index is not None or field_name, 'index and field_name cannot be empty at the same time.'
+        arg = None
+        if index is not None:
+            arg = self.args[index]
+        if field_name:
+            arg = self.kwargs.get(field_name) or arg
+        return arg

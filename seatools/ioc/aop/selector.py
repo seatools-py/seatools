@@ -1,7 +1,7 @@
 from typing import Any
 
 from seatools.ioc.aop.aspect import AbstractAspect
-from seatools.ioc.aop.expression import PointExpression
+from seatools.ioc.aop.matcher import AspectPointExpressionMather
 from seatools.ioc.aop.point import JoinPoint
 
 
@@ -9,7 +9,7 @@ class SelectorAspect(AbstractAspect):
 
     def __init__(self, aspect: AbstractAspect):
         self.aspect = aspect
-        self.express = PointExpression(self.aspect.pointcut)
+        self.mather = AspectPointExpressionMather(self.aspect.pointcut)
         self._cache = {}
 
     @property
@@ -20,7 +20,7 @@ class SelectorAspect(AbstractAspect):
         match = self._cache.get(point.path)
         if match is not None:
             return match
-        match = self.express.match(point.path)
+        match = self.mather.match(point.path)
         self._cache[point.path] = match
         return match
 

@@ -1,10 +1,22 @@
+import abc
 import re
 from typing import List, AnyStr, Optional
 
 
-class PointExpression:
+class AbstractMatcher(abc.ABC):
 
-    def __init__(self, expression):
+    def __init__(self, **kwargs):
+        pass
+
+    @abc.abstractmethod
+    def match(self, path: str) -> bool:
+        pass
+
+
+class AspectPointExpressionMather(AbstractMatcher):
+
+    def __init__(self, expression, **kwargs):
+        super().__init__(**kwargs)
         self.expression = expression
         self._patterns: List[re.Pattern[AnyStr]] = [re.compile('execution\s*\((.*)\)\s*')]
         self._compile = self.compile(expression)
