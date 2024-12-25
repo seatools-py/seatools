@@ -30,7 +30,7 @@ class AspectPointExpressionMather(AbstractMatcher):
         expression = self._patterns[0].findall(expression)
         if not expression:
             return None
-        expression = '^' + expression[0].strip().replace('*', '[a-zA-Z0-9]*').replace('..', '[a-zA-Z0-9.]*') + '$'
+        expression = '^' + expression[0].strip().replace('*', '([a-zA-Z0-9][a-zA-Z0-9_]*)').replace('..', '[a-zA-Z0-9._]*') + '$'
         return re.compile(expression)
 
     def match(self, path: str) -> bool:

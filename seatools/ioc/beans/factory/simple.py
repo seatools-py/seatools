@@ -4,6 +4,7 @@ import importlib
 from typing import Any, Type, Callable, Union, Optional, List, Dict, TypeVar, Tuple
 
 from ..proxy import *
+from ...aop.selector import SelectorAspect
 from ...utils import name_utils
 from .base import BeanFactory
 from .initializing_bean import InitializingBean
@@ -300,11 +301,11 @@ class SimpleBeanFactory(BeanFactory):
 
     def _rebuild_bean_from_aspect(self, aspect):
         for k, v in self._type_bean.items():
-            self._type_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, aspect) for e in v if e not in self._aspect_bean]
+            self._type_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, SelectorAspect(aspect)) for e in v if e not in self._aspect_bean]
         for k, v in self._name_bean.items():
-            self._name_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, aspect) for e in v if e not in self._aspect_bean]
+            self._name_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, SelectorAspect(aspect)) for e in v if e not in self._aspect_bean]
 
     def _build_bean_by_aspects(self, proxy):
         for bean in self._aspect_bean:
-            proxy = AspectClassBeanProxy(proxy.ioc_name(), proxy, bean)
+            proxy = AspectClassBeanProxy(proxy.ioc_name(), proxy, SelectorAspect(bean))
         return proxy
