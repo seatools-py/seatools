@@ -20,9 +20,6 @@ class DelayAutowiredClassBeanProxy(BaseBeanProxy):
         if self._extra_kwargs.get('required', True) and not obj:
             raise ValueError(
                 f'无法注入{("名称[" + self._name + "]") if self._name else ""}{("类型[" + self._cls.__name__ + "]") if self._cls.__name__ else ""}的bean')
-        # unwrapper
-        while issubclass(type(obj), BaseBeanProxy):
-            obj = obj.ioc_bean()
         return obj
 
     def ioc_bean(self):

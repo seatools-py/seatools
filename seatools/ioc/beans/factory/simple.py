@@ -34,11 +34,13 @@ class _Param:
 class SimpleBeanFactory(BeanFactory):
     """简单bean工厂"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, enable_aspect: bool = False, **kwargs):
         super().__init__(**kwargs)
         self._initialized = False
+        self._enable_aspect = enable_aspect
         self._name_bean = {}
         self._type_bean = {}
+        self._aspect_bean = []
         self._init_queue = queue.PriorityQueue()
         self._register_class_object_bean(name='simpleBeanFactory', obj=self)
 
@@ -106,6 +108,12 @@ class SimpleBeanFactory(BeanFactory):
                                     order: int = 0) -> Any:
         name = name or name_utils.to_camel_case(obj.__class__.__name__, upper_case=False)
         proxy = ClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
+        if self._enable_aspect:
+            if aspect:
+                self._aspect_bean.append(aspect)
+                self._rebuild_bean_from_aspect(proxy)
+            else:
+                proxy = self._build_bean_by_aspects(proxy)
         self._add_bean(proxy.ioc_name(), proxy.ioc_type(), proxy)
         return proxy
 
@@ -289,3 +297,14 @@ class SimpleBeanFactory(BeanFactory):
         beans = self._type_bean.get(_type) or []
         beans.append(bean)
         self._type_bean[_type] = beans
+
+    def _rebuild_bean_from_aspect(self, aspect):
+        for k, v in self._type_bean.items():
+            self._type_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, aspect) for e in v if e not in self._aspect_bean]
+        for k, v in self._name_bean.items():
+            self._name_bean[k] = [AspectClassBeanProxy(e.ioc_name(), e, aspect) for e in v if e not in self._aspect_bean]
+
+    def _build_bean_by_aspects(self, proxy):
+        for bean in self._aspect_bean:
+            proxy = AspectClassBeanProxy(proxy.ioc_name(), proxy, bean)
+        return proxy

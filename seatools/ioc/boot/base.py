@@ -18,7 +18,7 @@ class _Properties:
 
 
 def run(scan_package_names: Union[List[str], str], config_dir: str = None, factory: BeanFactory = None,
-        exclude_modules: List[str] = None):
+        exclude_modules: List[str] = None, enable_aspect: bool = False):
     """启动pyspring, 一个进程中重复启动仅第一次生效
 
     Args:
@@ -27,6 +27,7 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
         同时支持@Value, @Configuration装饰器通过IOC注入是属性和bean
         factory: bean工厂, 可自己实现, 默认走SimpleBeanFactory
         exclude_modules: 需要过滤的模块列表
+        enable_aspect: 是否开启aop
     """
     # 启动加锁
     with _Properties.lock:
@@ -36,7 +37,7 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
             scan_package_names = [scan_package_names]
         # 初始化工厂
         if _Properties.first:
-            bean_factory = new_bean_factory(factory=factory)
+            bean_factory = new_bean_factory(factory=factory, enable_aspect=enable_aspect)
             # 有配置则初始化配置
             if config_dir:
                 load_config(config_dir=config_dir)

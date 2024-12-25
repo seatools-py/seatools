@@ -67,3 +67,29 @@ def configuration_properties_bean(*args, prop: str = None, name: str = None, pri
 
 
 ConfigurationPropertiesBean = configuration_properties_bean
+
+
+def aspect_bean(*args, name: str = None, primary=False, order: int = 0):
+    """bean装饰器
+
+    Args:
+        name: bean name
+        primary: 是否默认, 当通过类型获取bean有多个bean时， 若无有primary或存在多个primary的bean将抛出异常, 仅当有一个primary时正常返回
+        order: bean加载顺序, 值越小越先加载, 若依赖bean order值大于当前bean, 则会优先等待依赖加载后再做加载
+    """
+
+    def wrapper(fc=None):
+        # 注册bean
+        _register_bean(name=name, cls=fc, primary=primary, order=order, aspect=True)
+        fc.__bean__ = True
+        return fc
+
+    if len(args) == 1 and (inspect.isclass(args[0]) or inspect.isfunction(args[0])):
+        return wrapper(args[0])
+
+    name = list_utils.get(args, 0, name)
+    primary = list_utils.get(args, 1, primary)
+    return wrapper
+
+
+Aspect = AspectBean = aspect_bean
