@@ -110,7 +110,7 @@ class SimpleBeanFactory(BeanFactory):
         proxy = ClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
         if self._enable_aspect:
             if aspect:
-                self._aspect_bean.append(aspect)
+                self._aspect_bean.append(proxy)
                 self._rebuild_bean_from_aspect(proxy)
             else:
                 proxy = self._build_bean_by_aspects(proxy)

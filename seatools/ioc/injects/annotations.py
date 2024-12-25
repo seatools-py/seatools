@@ -31,13 +31,14 @@ def bean(*args, name: str = None, primary=False, order: int = 0):
 Bean = bean
 
 
-def configuration_properties_bean(*args, prop: str = None, name: str = None, primary=False):
+def configuration_properties_bean(*args, prop: str = None, name: str = None, primary=False, order: int = 0):
     """配置属性bean. 仅支持pydantic model, dataclass, 同配置的构造函数, 仅支持非必填构造器, 若需要注入的构造参数默认值请使用unique_tools.ioc.Autowired()代替.
 
     Args:
         prop: 属性描述
         name: bean name
         primary: 是否默认, 当通过类型获取bean有多个bean时， 若无有primary或存在多个primary的bean将抛出异常, 仅当有一个primary时正常返回
+        order: bean加载顺序, 值越小越先加载, 若依赖bean order值大于当前bean, 则会优先等待依赖加载后再做加载
     """
 
     def wrapper(fc=None):
@@ -75,7 +76,7 @@ def aspect_bean(*args, name: str = None, primary=False, order: int = 0):
     Args:
         name: bean name
         primary: 是否默认, 当通过类型获取bean有多个bean时， 若无有primary或存在多个primary的bean将抛出异常, 仅当有一个primary时正常返回
-        order: bean加载顺序, 值越小越先加载, 若依赖bean order值大于当前bean, 则会优先等待依赖加载后再做加载
+        order: bean加载顺序或者aop执行顺序, 该值越大aop越先执行(与ioc bean加载相反)
     """
 
     def wrapper(fc=None):
