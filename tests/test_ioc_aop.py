@@ -52,7 +52,6 @@ class AAop(AbstractAspect):
         print('A after_exception')
 
 
-@Aspect
 class A2Aop(AbstractAspect):
     pointcut = "execution(tests.test_ioc_aop.A.*)"
 
@@ -73,6 +72,11 @@ class A2Aop(AbstractAspect):
 
     def after_exception(self, point: JoinPoint, ex: Exception, **kwargs) -> None:
         print('A2 after_exception')
+
+
+@Aspect
+def a2_aop():
+    return A2Aop()
 
 
 def test_ioc_aop_success():

@@ -170,10 +170,10 @@ class AspectClassBeanProxy(BaseBeanProxy):
             return attr
 
         def wrapper(*args, **kwargs):
-            instance = self.ioc_bean()
+            target = self.ioc_bean()
             join_point = JoinPoint(
-                path=inspect.getmodule(instance).__name__ + '.' + get_real_type(instance).__name__ + '.' + item,
-                instance=instance,
+                path=inspect.getmodule(target).__name__ + '.' + get_real_type(target).__name__ + '.' + item,
+                target=target,
                 method_name=item,
                 args=args,
                 kwargs=kwargs)

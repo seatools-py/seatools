@@ -3,25 +3,25 @@ from typing import Any, Tuple, Dict
 
 class JoinPoint:
 
-    def __init__(self, path, instance, method_name, args: Tuple[Any, ...], kwargs: Dict[str, Any]):
+    def __init__(self, path, target, method_name, args: Tuple[Any, ...], kwargs: Dict[str, Any]):
         """
         Args:
            path: pointcut module-class-method path. example: xxx.xxx.xxx.XxxClass.xxx_method
-           instance: pointcut proxy instance
+           target: pointcut proxy target
            method_name: pointcut method name
            args: pointcut method args
            kwargs: pointcut method kwargs
         """
-        self.instance = instance
+        self.target = target
         self.method_name = method_name
-        self.method = getattr(instance, method_name)
+        self.method = getattr(target, method_name)
         self.args = args
         self.kwargs = kwargs
         self.return_value = None
         self.path = path
 
-    def process(self) -> Any:
-        """do point process."""
+    def proceed(self) -> Any:
+        """do point method."""
         self.return_value = self.method(*self.args, **self.kwargs)
         return self.return_value
 

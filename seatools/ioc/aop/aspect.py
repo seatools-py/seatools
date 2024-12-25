@@ -27,7 +27,7 @@ class AbstractAspect(abc.ABC):
 
     def around(self, point: JoinPoint, **kwargs) -> Any:
         """around aspect. Note: use point.process() to call aspect function."""
-        return point.process()
+        return point.proceed()
 
     def after(self, point: JoinPoint, **kwargs) -> None:
         """after aspect."""

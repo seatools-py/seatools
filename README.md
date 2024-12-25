@@ -1,5 +1,6 @@
-# Seatools Python新一代IOC框架 (Python >= 3.9)
+from typing import Any
 
+# Seatools Python新一代IOC框架 (Python >= 3.9)
 
 ## 仓库地址:
 1. https://github.com/seatools-py/seatools
@@ -21,6 +22,12 @@ pip install seatools --upgrade
 ## 介绍
 
 Seatools 参考 Java Spring 独立设计一套相似 API 的轻量级 IOC 工具，对 Java Spring 熟悉的开发者能够快速上手
+核心功能:
+- IOC 容器管理
+- IOC 配置管理
+- starter 机制简化开发
+- aop 切面 (实验中)
+- 便捷的API(与Java Spring类似)
 
 ## 实现原理
 1. 与Java Spring类似通过包模块扫描，将需要IOC创建管理容器的配置信息放入队列，在IOC初始化完成后，将队列中的容器配置全部取出依次生成容器
@@ -91,7 +98,7 @@ xxxb.do_anything() # 输出：XXXB
 """
 ```
 
-## IOC 工具
+## IOC 容器
 1. `seatools.ioc.boot.run` - `function`: ioc 启动函数, 类似 Java Spring 的 `@SpringBootApplication`，需要声明扫描的包与配置目录, 目前默认读取配置目录的`application.yml`,`application-[dev|test|pro].yml` 后续会拓展文件类型, 使用示例:
 ```python
 from seatools.ioc import run
@@ -330,7 +337,67 @@ xxx_service.print()
 """
 ```
 
+## AOP 切面
+1. 使用示例, 以`xxx.py`为例, 并且`PYTHONPATH=.`
 
+```python
+from typing import Any
+from seatools.ioc import run, Bean, Aspect, Autowired, AbstractAspect, JoinPoint
+
+
+@Bean
+class A:
+
+    def run(self, name: str):
+        print("run")
+        return f"A {name}"
+
+
+@Aspect
+class AAop(AbstractAspect):
+    pointcut = "execution(xxx.A.*)"  # 其中xxx.A.* 表示xxx模块中的类A中的所有公共方法 (暂仅支持公共方法, 以下划线开始的方法均不支持)，切点不能为Aspect实例
+
+    def before(self, point: JoinPoint, **kwargs) -> None:
+        # before
+        print("before")
+
+    def after(self, point: JoinPoint, **kwargs) -> None:
+        # after
+        print("after")
+
+    def around(self, point: JoinPoint, **kwargs) -> Any:
+        # do point method
+        print("around before")
+        ans = point.proceed()
+        print("around after")
+        return ans
+
+    def after_returning(self, point: JoinPoint, return_value: Any, **kwargs) -> None:
+        # success returning
+        print("after_returning")
+
+    def after_exception(self, point: JoinPoint, ex: Exception, **kwargs) -> None:
+        # failure exception
+        print("after_exception")
+
+# 启动IOC
+run(scan_package_names='xxx', config_dir='config',
+    # 使用aop启动需开启该参数
+    enable_aspect=True)
+
+# 获取A类型容器
+a = Autowired(cls=A)
+print(a.run("啦啦啦"))
+"""
+输出：
+before
+around before
+run
+around after
+after returning
+after
+"""
+```
 
 ## 核心 APIs 列表
 ### [一、`seatools.ioc` 轻量级ioc工具](./docs/ioc工具.md), [ioc详解](./docs/ioc详解.md)
