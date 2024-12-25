@@ -338,7 +338,7 @@ xxx_service.print()
 ```
 
 ## AOP 切面
-1. 使用示例, 以`xxx.py`为例, 并且`PYTHONPATH=.`
+1. 使用示例, 以`xxx.py`为例, 并且`PYTHONPATH=.` (虽然支持AOP但仅建议在日志、监控等场景使用AOP, 若在业务中使用AOP将会导致逻辑不直观, 谨慎使用！)
 
 ```python
 from typing import Any
