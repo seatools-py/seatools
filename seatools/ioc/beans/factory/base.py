@@ -5,6 +5,9 @@ from typing import Union, Type, Callable, Any
 class BeanFactory(abc.ABC):
     """Bean工厂抽象类"""
 
+    def __init__(self, **kwargs):
+        pass
+
     @abc.abstractmethod
     def get_bean(self, name: str = None, required_type: Union[Type, Callable] = None):
         """获取bean方法."""

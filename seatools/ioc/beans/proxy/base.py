@@ -1,9 +1,14 @@
 import abc
+import warnings
+import inspect
 from typing import Any
+
+from seatools.ioc.aop.point import JoinPoint
 
 
 class BasicTypeMixin(abc.ABC):
     """基本数据类型Mixin."""
+
     @property
     def value(self):
         raise NotImplementedError
@@ -67,10 +72,10 @@ class BaseBeanProxy(BasicTypeMixin, abc.ABC):
 
     def ioc_type(self):
         """获取被代理的类型"""
-        return type(self.ioc_bean())
+        return type(self.value)
 
     def ioc_bean(self):
-        """获取被代理的真实对象"""
+        """获取被代理的对象."""
         return self._obj
 
     def __getattr__(self, item):
@@ -110,23 +115,77 @@ class BaseBeanProxy(BasicTypeMixin, abc.ABC):
 
     @property
     def value(self):
-        return self.ioc_bean()
+        v = self.ioc_bean()
+        while issubclass(type(v), BaseBeanProxy):
+            v = v.ioc_bean()
+        return v
 
 
 class ClassBeanProxy(BaseBeanProxy):
     """类对象bean代理"""
 
-    def __init__(self, name: str, obj: Any, *args, primary: bool = False, **kwargs):
+    def __init__(self, name: str, obj: Any, primary: bool = False, order: int = 0, *args, **kwargs):
         """
         Args:
             obj: 特定类的对象
         """
         super().__init__(name, obj, *args, **kwargs)
         self._primary = primary
+        self._order = order
 
     def instanceof(self, clazz):
         """判断实际对象是否是某个类型的实例"""
         return isinstance(self.ioc_bean(), clazz)
 
     def primary(self):
+        warnings.warn("Deprecated. Use ioc_primary to repeat it.", DeprecationWarning)
         return self._primary
+
+    def ioc_primary(self):
+        return self._primary
+
+    def ioc_order(self):
+        return self._order
+
+
+def get_real_type(obj):
+    if issubclass(type(obj), BaseBeanProxy):
+        return obj.ioc_type()
+    return type(obj)
+
+
+class AspectClassBeanProxy(BaseBeanProxy):
+
+    def __init__(self, name: str, obj: Any, aspect, *args, **kwargs):
+        """
+        Args:
+            obj: 特定类的对象
+        """
+        super().__init__(name, obj, *args, **kwargs)
+        self._aspect = aspect
+
+    def __getattr__(self, item):
+        attr = getattr(self.ioc_bean(), item)
+        if not callable(attr) or not self._aspect:
+            return attr
+
+        def wrapper(*args, **kwargs):
+            instance = self.ioc_bean()
+            join_point = JoinPoint(
+                path=inspect.getmodule(instance).__name__ + '.' + get_real_type(instance).__name__ + '.' + item,
+                instance=instance,
+                method_name=item,
+                args=args,
+                kwargs=kwargs)
+            self._aspect.before(join_point)
+            try:
+                value = self._aspect.around(join_point)
+                self._aspect.after_returning(join_point, value)
+                return value
+            except Exception as ex:
+                self._aspect.after_exception(join_point, ex)
+                raise ex
+            finally:
+                self._aspect.after(join_point)
+
+        return wrapper

@@ -17,11 +17,15 @@ class _Param:
     name: str
     cls: Any
     primary: bool
+    aspect: bool
+    order: int
 
-    def __init__(self, name: str = None, cls: Any = None, primary: bool = False):
+    def __init__(self, name: str = None, cls: Any = None, primary: bool = False, aspect: bool = False, order: int = 0):
         self.name = name
         self.cls = cls
         self.primary = primary
+        self.aspect = aspect
+        self.order = order
 
     def __lt__(self, other):
         return False
@@ -30,13 +34,13 @@ class _Param:
 class SimpleBeanFactory(BeanFactory):
     """简单bean工厂"""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._initialized = False
         self._name_bean = {}
         self._type_bean = {}
         self._init_queue = queue.PriorityQueue()
-        self._dependency_map = {}
         self._register_class_object_bean(name='simpleBeanFactory', obj=self)
-        self._initialized = False
 
     def get_bean(self, name: str = None, required_type: Union[Type, Callable] = None) -> Any:
         if not name and not required_type:
@@ -52,7 +56,7 @@ class SimpleBeanFactory(BeanFactory):
         if len(beans) >= 2:
             for bean in beans:
                 # 有primary返回primary
-                if bean.primary():
+                if bean.ioc_primary():
                     return bean
             if len(beans) >= 2:
                 raise RuntimeError('获取的bean数量不能超过1个, 请增加名称/类型获取bean或给某个bean配置primary属性')
@@ -92,21 +96,22 @@ class SimpleBeanFactory(BeanFactory):
                     beans = [*beans, *self._type_bean[_type]]
         return beans
 
-    def _register_function_bean(self, name: str, func, primary: bool = False) -> Any:
+    def _register_function_bean(self, name: str, func, primary: bool = False, aspect: bool = False,
+                                order: int = 0) -> Any:
         name = name or name_utils.to_camel_case(func.__name__, upper_case=False)
-        proxy = ClassBeanProxy(name=name, obj=self._new_function_bean(func), primary=primary)
-        self._add_bean(proxy.ioc_name(), proxy.ioc_type(), proxy)
-        return proxy
+        return self._register_class_object_bean(name, self._new_function_bean(func), primary=primary, aspect=aspect,
+                                                order=order)
 
-    def _register_class_object_bean(self, name, obj, primary: bool = False) -> Any:
+    def _register_class_object_bean(self, name, obj, primary: bool = False, aspect: bool = False,
+                                    order: int = 0) -> Any:
         name = name or name_utils.to_camel_case(obj.__class__.__name__, upper_case=False)
-        proxy = ClassBeanProxy(name=name, obj=obj, primary=primary)
+        proxy = ClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
         self._add_bean(proxy.ioc_name(), proxy.ioc_type(), proxy)
         return proxy
 
-    def _register_class_bean(self, name: str, cls, primary: bool = False) -> Any:
-        return self._register_class_object_bean(name, self._new_class_bean(cls), primary=primary)
-
+    def _register_class_bean(self, name: str, cls, primary: bool = False, aspect: bool = False, order: int = 0) -> Any:
+        return self._register_class_object_bean(name, self._new_class_bean(cls), primary=primary, aspect=aspect,
+                                                order=order)
 
     def _new_class_bean(self, cls) -> Any:
         params = self._extract_func_enable_autowired_args(cls)
@@ -149,7 +154,7 @@ class SimpleBeanFactory(BeanFactory):
     def _extract_class_attr_depends_args(self, cls) -> Tuple[dict, dict]:
         """抽取类属性依赖参数信息."""
         members = [member for member in inspect.getmembers(cls) if issubclass(type(member[-1]), BaseBeanProxy)]
-        return {member[0]: member[-1].ioc_type() for member in members}, {member[0]: member[-1].ioc_name()  for member in members}
+        return {member[0]: member[-1].ioc_type() for member in members}, {member[0]: member[-1].ioc_name() for member in members}
 
     def _extract_func_enable_autowired_args(self, func) -> dict:
         """抽取函数可注入参数."""
@@ -159,20 +164,21 @@ class SimpleBeanFactory(BeanFactory):
                 params[name] = Autowired(value=name_params.get(name), cls=cls)
         return params
 
-    def register_bean(self, name: str, cls, primary: bool = False, order: int = 0, lazy=True) -> Any:
+    def register_bean(self, name: str, cls, primary: bool = False, order: int = 0, lazy=True,
+                      aspect: bool = False) -> Any:
         # 注册bean懒加载, 在init方法执行bean创建逻辑
         if lazy and not self._initialized:
-            self._init_queue.put((order, _Param(name, cls, primary)))
+            self._init_queue.put((order, _Param(name, cls, primary, aspect, order)))
         else:
-            self._register_bean(name, cls, primary)
+            self._register_bean(name, cls, primary, aspect, order)
 
-    def _register_bean(self, name: str, cls, primary: bool = False) -> Any:
+    def _register_bean(self, name: str, cls, primary: bool = False, aspect: bool = False, order: int = 0) -> Any:
         if inspect.isfunction(cls):
-            return self._register_function_bean(name, cls, primary=primary)
+            return self._register_function_bean(name, cls, primary=primary, aspect=aspect, order=order)
         if inspect.isclass(cls):
-            return self._register_class_bean(name, cls, primary=primary)
+            return self._register_class_bean(name, cls, primary=primary, aspect=aspect, order=order)
         # 否则直接视为对象注册
-        return self._register_class_object_bean(name, cls, primary=primary)
+        return self._register_class_object_bean(name, cls, primary=primary, aspect=aspect, order=order)
 
     def init(self):
         """初始化容器, 在bean都注册进工厂队列后执行, 同时解决多个容器间的依赖问题"""
@@ -202,7 +208,7 @@ class SimpleBeanFactory(BeanFactory):
                 # 没有依赖则可以直接注册bean
                 depends_params, depends_name_params = self._get_depends_args(param)
                 if not depends_params:
-                    self._register_bean(param.name, param.cls, param.primary)
+                    self._register_bean(param.name, param.cls, param.primary, param.aspect, param.order)
                     continue
                 # 依赖入队列
                 depends.append({'param': param, 'depends': depends_params, 'depends_name': depends_name_params})
@@ -235,7 +241,8 @@ class SimpleBeanFactory(BeanFactory):
                     params[name] = obj
                 # 获取的依赖数量与目标一致则可以创建bean
                 if len(params) == len(dep['depends']):
-                    self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary)
+                    self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary, dep['param'].aspect,
+                                        dep['param'].order)
                     end = False
                 else:
                     next_depends.append(dep)
@@ -249,7 +256,8 @@ class SimpleBeanFactory(BeanFactory):
 
         # 处理循环依赖
         for dep in depends:
-            self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary)
+            self._register_bean(dep['param'].name, dep['param'].cls, dep['param'].primary, dep['param'].aspect,
+                                dep['param'].order)
 
     def _get_depends_args(self, param: _Param) -> Tuple[Optional[dict], Optional[dict]]:
         """判断要创建的bean是否存在依赖

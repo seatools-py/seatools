@@ -15,13 +15,13 @@ class _BeanVars:
     environment = None
 
 
-def new_bean_factory(factory=None):
+def new_bean_factory(factory=None, **kwargs):
     with _lock:
         if factory:
             _BeanVars.bean_factory = factory
         else:
             from seatools.ioc.beans.factory import SimpleBeanFactory
-            _BeanVars.bean_factory = SimpleBeanFactory()
+            _BeanVars.bean_factory = SimpleBeanFactory(**kwargs)
     _consume_pre_inject_queue()
     return _BeanVars.bean_factory
 

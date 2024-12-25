@@ -33,10 +33,6 @@ class DelayAutowiredClassBeanProxy(BaseBeanProxy):
     def ioc_type(self):
         return self._cls
 
-    @property
-    def value(self):
-        return self.ioc_bean()
-
 
 class DelayConfigAutowiredClassBeanProxy(BaseBeanProxy):
 

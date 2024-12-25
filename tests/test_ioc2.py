@@ -86,4 +86,6 @@ def test_ioc_order():
     b = Autowired(cls=B)
     a.hello()
     b.hello()
-
+    import inspect
+    module = inspect.getmodule(b)
+    print(module.__name__)
