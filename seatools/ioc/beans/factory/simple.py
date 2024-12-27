@@ -190,10 +190,7 @@ class SimpleBeanFactory(BeanFactory):
         return self._register_class_object_bean(name, cls, primary=primary, aspect=aspect, order=order)
 
     def init(self):
-        """初始化容器, 在bean都注册进工厂队列后执行, 同时解决多个容器间的依赖问题"""
-        # initialized do not things.
-        if self._initialized:
-            return
+        """初始化容器, 在bean都注册进工厂队列后执行, 同时解决多个容器间的依赖问题."""
         # 创建容器
         self._create_beans()
         # 初始化
@@ -204,12 +201,16 @@ class SimpleBeanFactory(BeanFactory):
         # 对所有容器执行__post_construct__, InitializingBean.after_properties_set 初始化方法
         for beans in self._name_bean.values():
             for bean in beans:
+                if bean.ioc_initialized:
+                  continue
                 # 容器原始类型是类才能执行
                 if inspect.isclass(bean.ioc_type()):
                     if hasattr(bean.ioc_type(), '__post_construct__'):
                         bean.__post_construct__()
+                        bean.ioc_initialized = True
                     if issubclass(bean.ioc_type(), InitializingBean):
                         bean.after_properties_set()
+                        bean.ioc_initialized = True
 
     def _create_beans(self):
         depends = []

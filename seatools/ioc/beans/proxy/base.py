@@ -63,6 +63,7 @@ class BaseBeanProxy(BasicTypeMixin, abc.ABC):
         """
         self._name = name
         self._obj = obj
+        self.ioc_initialized = False
         self._extra_args = args
         self._extra_kwargs = kwargs
 

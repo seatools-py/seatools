@@ -19,38 +19,38 @@ class _Properties:
 
 def run(scan_package_names: Union[List[str], str], config_dir: str = None, factory: BeanFactory = None,
         exclude_modules: List[str] = None, enable_aspect: bool = False):
-    """启动pyspring, 一个进程中重复启动仅第一次生效
+    """Start seatools.ioc. Allow repeated runs. A module only load once.
 
     Args:
-        scan_package_names: 需要扫描的包, 支持多个包, 示例: xxx.xxx; xxx
-        config_dir: 配置目录, 若不为空则加将config_dir目录下的 application.yml, application-{env}.yml 文件(如果存在) 加载到系统配置中
-        同时支持@Value, @Configuration装饰器通过IOC注入是属性和bean
-        factory: bean工厂, 可自己实现, 默认走SimpleBeanFactory
-        exclude_modules: 需要过滤的模块列表
-        enable_aspect: 是否开启aop
+        scan_package_names: Packages to scan, supports multiple packages, e.g., xxx.xxx; xxx
+        config_dir: Configuration directory, if not empty, it will load application.yml and application-{env}.yml files (if exist) from the config_dir directory into the system configuration.
+        It also supports injecting properties and beans through IOC using @Value and @Configuration decorators.
+        factory: Bean factory, can be implemented by yourself, defaults to SimpleBeanFactory.
+        exclude_modules: List of modules to exclude.
+        enable_aspect: Whether to enable AOP.
     """
-    # 启动加锁
+    # Start with locking
     with _Properties.lock:
         if not scan_package_names:
-            raise ValueError('包名不能为空')
+            raise ValueError('Package name cannot be empty.')
         if isinstance(scan_package_names, str):
             scan_package_names = [scan_package_names]
-        # 初始化工厂
+        # Initialize factory
         if _Properties.first:
             bean_factory = new_bean_factory(factory=factory, enable_aspect=enable_aspect)
-            # 有配置则初始化配置
+            # Initialize configuration if provided
             if config_dir:
                 load_config(config_dir=config_dir)
 
-            # 注册Environment
+            # Register Environment
             from seatools.ioc.environment import Environment
             bean_factory.register_bean(name='environment', cls=Environment, primary=True, lazy=False)
 
-            # 注册 ApplicationContext
+            # Register ApplicationContext
             bean_factory.register_bean(name='applicationContext', cls=ApplicationContext(bean_factory), primary=True,
                                        lazy=False)
 
-            # 添加starters包优先自动加载
+            # Add starters package for priority auto-loading
             scan_package_names = ['seatools.ioc.starters'] + scan_package_names
 
             _Properties.first = False
@@ -58,7 +58,7 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
             bean_factory = get_bean_factory()
 
         for scan_package_name in scan_package_names:
-            # 加载包下所有某个和bean, 并注入到工厂
+            # Load all beans in the package and inject into the factory
             modules = reflect_utils.get_all_py_modules(scan_package_name)
             for module in modules:
                 if not exclude_modules:
@@ -69,23 +69,23 @@ def run(scan_package_names: Union[List[str], str], config_dir: str = None, facto
                         break
                 else:
                     _load_module(module)
-        # 初始化创建bean实例
+        # Bean initialization
         bean_factory.init()
-        # 释放加载资源
+        # Release loading resources
         _release()
 
 
 def _release():
-    # 释放资源
+    # Release resources
     _Properties.loaded_modules.clear()
 
 
 def _load_module(module):
     if module in _Properties.loaded_modules:
         return
-    # 防止出现递归无限加载, 优先放入记录再加载
+    # Prevent infinite recursive loading, add to record first then loa
     _Properties.loaded_modules.add(module)
     try:
         importlib.import_module(module)
-    except ModuleNotFoundError:
-        logger.warning('Module {} not found.Cannot to import by seatools.ioc'.format(module))
+    except ModuleNotFoundError as e:
+        logger.warning('Module {} not found.Cannot to import by seatools.ioc. Reason: {}', module, e)

@@ -108,5 +108,8 @@ class BB:
 
 def test_depends():
     ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
+    ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
+    ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
+    ioc.run(scan_package_names='tests.test_ioc', config_dir='config')
     b: BB = ioc.Autowired(cls=BB)
     b.hello()
