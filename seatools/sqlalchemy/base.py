@@ -1,3 +1,4 @@
+import importlib
 from sqlalchemy import create_engine, Engine, text
 from sqlalchemy.orm import sessionmaker, DeclarativeBase, Session
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncEngine, AsyncSession
@@ -88,6 +89,12 @@ class Base(DeclarativeBase):
         return session.execute(text('TRUNCATE {}'.format(cls.__tablename__)))
 
 
+def _get_session_cls(module_cls: str):
+    module_cls_seq = module_cls.split('.')
+    module_name, class_name = '.'.join(module_cls_seq[:-1]), module_cls_seq[-1]
+    return getattr(importlib.import_module(module_name) if module_name else globals(), class_name, None)
+
+
 class SqlAlchemyClient:
     """SqlAlchemy工具客户端"""
 
@@ -104,6 +111,9 @@ class SqlAlchemyClient:
             echo: The echo=True parameter indicates that SQL emitted by connections will be logged to standard out.
         """
         self._engine = create_engine(url, echo=echo, **kwargs)
+        # 字符串则动态引入模块
+        if session_cls and isinstance(session_cls, str):
+            session_cls = _get_session_cls(session_cls)
         self._session_maker = sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @contextmanager
@@ -148,6 +158,9 @@ class AsyncSqlAlchemyClient:
             echo: The echo=True parameter indicates that SQL emitted by connections will be logged to standard out.
         """
         self._engine = create_async_engine(url, echo=echo, **kwargs)
+        # 字符串则动态引入模块
+        if session_cls and isinstance(session_cls, str):
+            session_cls = _get_session_cls(session_cls)
         self._session_maker = async_sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @asynccontextmanager
