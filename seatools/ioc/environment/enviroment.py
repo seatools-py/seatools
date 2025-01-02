@@ -11,6 +11,8 @@ class Environment:
     def get_property(self, name: str, cls: Type = None) -> Any:
         data = parse_express_value(data=cfg(), express=name)
         if data is None:
+            if cls:
+                return cls()
             return None
         if cls:
             return convert(data, cls)
