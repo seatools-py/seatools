@@ -99,7 +99,7 @@ xxxb.do_anything() # 输出：XXXB
 ```
 
 ## IOC 容器
-1. `seatools.ioc.boot.run` - `function`: ioc 启动函数, 类似 Java Spring 的 `@SpringBootApplication`，需要声明扫描的包与配置目录, 目前默认读取配置目录的`application.yml`,`application-[dev|test|pro].yml` 后续会拓展文件类型, 使用示例:
+1. `seatools.ioc.boot.run` - `function`: ioc 启动函数, 类似 Java Spring 的 `@SpringBootApplication`，需要声明扫描的包与配置目录, 目前默认读取配置目录的`application.[yml|yaml|json|properties|xml|py]`,`application-[dev|test|pro].[yml|yaml|json|properties|xml|py]`, 使用示例:
 ```python
 from seatools.ioc import run
 run(scan_package_names='xxx', config_dir='config') # 其中scan_package_names参数支持字符串, 字符串列表, 按顺序扫描包
