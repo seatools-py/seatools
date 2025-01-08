@@ -72,3 +72,11 @@ def test_file_loads(tmp_path):
     with open(tmp_file, 'w', encoding='utf-8') as f:
         f.write(json.dumps({'a': 1, 'b': {'c': 2, 'd': 'sadas'}}))
     adfl.load_file(file_path=tmp_file.as_posix())
+
+
+def test_py_file_loads():
+    adfl = AutoDataFileLoader()
+    data = adfl.load_file('config/application.py')
+    print(data)
+
+

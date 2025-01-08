@@ -20,7 +20,7 @@ def load_config(config_dir: str):
     :param config_dir: 项目目录地址
     """
     # 当前项目的配置文件
-    config_file_path = _find_file_path(config_dir, '^application.(yml|yaml|json|properties|xml)$') or (
+    config_file_path = _find_file_path(config_dir, '^application.(yml|yaml|json|properties|xml|py)$') or (
             config_dir + os.sep + 'application.yml')
     # 使用 active
     actives = []
@@ -45,7 +45,7 @@ def load_config(config_dir: str):
             actives = [config_active.strip() for config_active in config_actives.split(',')]
 
     for active in actives:
-        active_config_file_path = _find_file_path(config_dir, f'^application-{active}.(yml|yaml|json|properties|xml)$')
+        active_config_file_path = _find_file_path(config_dir, f'^application-{active}.(yml|yaml|json|properties|xml|py)$')
         if not active_config_file_path:
             continue
         if not os.path.exists(active_config_file_path):

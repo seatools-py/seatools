@@ -12,6 +12,7 @@ from .eval import EvalDataFileLoader, EvalDataFileExtractor
 from .properties import PropertiesDataFileLoader, PropertiesDataFileExtractor
 from .xml import XmlDataFileLoader, XmlDataFileExtractor
 from .excel import ExcelDataFileLoader, ExcelDataFileExtractor
+from .py import PyDataFileLoader, PyDataFileExtractor
 
 _csv_data_file_loader = CsvDataFileLoader()
 _csv_data_file_extractor = CsvDataFileExtractor()
@@ -29,6 +30,8 @@ _xml_data_file_loader = XmlDataFileLoader()
 _xml_data_file_extractor = XmlDataFileExtractor()
 _excel_data_file_loader = ExcelDataFileLoader()
 _excel_data_file_extractor = ExcelDataFileExtractor()
+_py_data_file_loader = PyDataFileLoader()
+_py_data_file_extractor = PyDataFileExtractor()
 
 
 class DataType(Enum):
@@ -57,6 +60,9 @@ class DataType(Enum):
     EXCEL = (('xls', 'xlsx'),
              _excel_data_file_loader.load, _excel_data_file_loader.load_file,
              _excel_data_file_extractor.extract, _excel_data_file_extractor.extract_file)
+    PY = (('py', 'pyi', 'pyx'),
+          _py_data_file_loader.load, _py_data_file_loader.load_file,
+          _py_data_file_extractor.extract, _py_data_file_extractor.extract_file)
 
 
 def get_file_data_type(file_path: str) -> Optional[DataType]:
