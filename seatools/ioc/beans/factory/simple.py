@@ -191,6 +191,8 @@ class SimpleBeanFactory(BeanFactory):
 
     def init(self):
         """初始化容器, 在bean都注册进工厂队列后执行, 同时解决多个容器间的依赖问题."""
+        if self._initialized:
+            return
         # 创建容器
         self._create_beans()
         # 初始化
