@@ -14,3 +14,5 @@ autopep8
 pytest-cov
 nox
 pytest-asyncio
+sphinx
+sphinx-rtd-theme

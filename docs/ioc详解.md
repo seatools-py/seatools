@@ -97,7 +97,7 @@ print(b.str + 'aa')
 """
 
 # Value也允许直接装配Model
-from seatools.models import BaseModel:
+from seatools.models import BaseModel
 
 class C(BaseModel):
     a: int
