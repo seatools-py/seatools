@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>最佳实践指南 &mdash; Seatools 1.0.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a6e84886"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="构建器工具" href="builders.html" />
+    <link rel="prev" title="环境管理" href="env.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Seatools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ioc.html">IOC 容器详解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="files.html">文件处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notices.html">通知服务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">数据库支持</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">实用工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="env.html">环境管理</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">最佳实践指南</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">项目结构</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ioc">IOC 最佳实践</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bean">1. Bean 定义</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">2. 依赖注入</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">数据库最佳实践</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#orm">1. ORM 使用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">2. 事务管理</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id6">配置管理最佳实践</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id7">1. 配置分层</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id8">2. 环境管理</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id9">日志最佳实践</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id10">1. 日志配置</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id11">2. 日志使用</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id12">安全最佳实践</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id13">1. 密码处理</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id14">2. 敏感信息</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#id15">性能优化建议</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id16">1. 缓存使用</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id17">2. 数据库优化</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="builders.html">构建器工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="retry.html">重试机制</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cache.html">缓存支持</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Seatools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">最佳实践指南</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/best_practices.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>最佳实践指南<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<p>本文档提供使用 Seatools 框架的最佳实践建议。</p>
+<section id="id2">
+<h2>项目结构<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>推荐的项目目录结构:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>my_project/
+├── config/
+│   ├── application.yml         # 基础配置
+│   ├── application-dev.yml     # 开发环境配置
+│   ├── application-test.yml    # 测试环境配置
+│   └── application-pro.yml     # 生产环境配置
+├── my_project/
+│   ├── __init__.py
+│   ├── models/                 # 数据模型
+│   │   ├── __init__.py
+│   │   └── user.py
+│   ├── services/              # 业务服务
+│   │   ├── __init__.py
+│   │   └── user_service.py
+│   ├── dao/                   # 数据访问
+│   │   ├── __init__.py
+│   │   └── user_dao.py
+│   └── utils/                 # 工具类
+│       ├── __init__.py
+│       └── common.py
+└── main.py                    # 程序入口
+</pre></div>
+</div>
+</section>
+<section id="ioc">
+<h2>IOC 最佳实践<a class="headerlink" href="#ioc" title="Link to this heading"></a></h2>
+<section id="bean">
+<h3>1. Bean 定义<a class="headerlink" href="#bean" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>单例 Bean 使用类装饰器</p></li>
+<li><p>多例 Bean 使用函数装饰器</p></li>
+<li><p>Bean 名称使用小写字母+下划线</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">seatools.ioc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bean</span><span class="p">,</span> <span class="n">Autowired</span>
+
+<span class="c1"># 单例</span>
+<span class="nd">@Bean</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;user&quot;</span>
+
+<span class="c1"># 多例</span>
+<span class="nd">@Bean</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;orderService&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrderService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_service</span><span class="p">:</span> <span class="n">UserService</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_service</span> <span class="o">=</span> <span class="n">user_service</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h3>2. 依赖注入<a class="headerlink" href="#id3" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>推荐使用构造函数注入</p></li>
+<li><p>Autowired 只能用于方法参数的默认值</p></li>
+<li><p>不能在类属性中使用 Autowired</p></li>
+<li><p>使用 Autowired 时必须指定容器名称或类型</p></li>
+<li><p>被 &#64;Bean 装饰的类的构造方法中可以省略 Autowired</p></li>
+<li><p>使用类型注解提高代码可读性</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@Bean</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrderService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_service</span><span class="p">:</span> <span class="n">UserService</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_service</span> <span class="o">=</span> <span class="n">user_service</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_order</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order_service</span><span class="p">:</span> <span class="n">OrderService</span> <span class="o">=</span> <span class="n">Autowired</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">OrderService</span><span class="p">)):</span>
+    <span class="k">return</span> <span class="n">order_service</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_order2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order_service</span> <span class="o">=</span> <span class="n">Autowired</span><span class="p">(</span><span class="s1">&#39;orderService&#39;</span><span class="p">)):</span>
+    <span class="k">return</span> <span class="n">order_service</span><span class="o">.</span><span class="n">process</span><span class="p">()</span>
+
+<span class="c1"># 没有 @Bean 装饰器，必须使用 Autowired</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NonBeanService</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_service</span><span class="p">:</span> <span class="n">UserService</span> <span class="o">=</span> <span class="n">Autowired</span><span class="p">(</span><span class="bp">cls</span><span class="o">=</span><span class="n">UserService</span><span class="p">)):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_service</span> <span class="o">=</span> <span class="n">user_service</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id4">
+<h2>数据库最佳实践<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<section id="orm">
+<h3>1. ORM 使用<a class="headerlink" href="#orm" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>业务层使用 pydantic 模型</p></li>
+<li><p>数据访问层使用 SQLAlchemy 模型</p></li>
+<li><p>使用 BaseMapper 简化 CRUD 操作</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 模型定义</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+<span class="c1"># ORM 模型</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s1">&#39;users&#39;</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">)</span>
+
+<span class="c1"># 数据访问层</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserDAO</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">session</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id5">
+<h3>2. 事务管理<a class="headerlink" href="#id5" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>使用上下文管理器处理事务</p></li>
+<li><p>合理设置事务边界</p></li>
+<li><p>避免长事务</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">client</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># 业务操作</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">rollback</span><span class="p">()</span>
+        <span class="k">raise</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id6">
+<h2>配置管理最佳实践<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<section id="id7">
+<h3>1. 配置分层<a class="headerlink" href="#id7" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>按环境拆分配置文件</p></li>
+<li><p>敏感信息使用环境变量</p></li>
+<li><p>使用配置类封装配置项</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@ConfigurationPropertiesBean</span><span class="p">(</span><span class="n">prop</span><span class="o">=</span><span class="s1">&#39;mysql&#39;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MysqlConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">host</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3306</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span>
+</pre></div>
+</div>
+</section>
+<section id="id8">
+<h3>2. 环境管理<a class="headerlink" href="#id8" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>使用 ENV 环境变量区分环境</p></li>
+<li><p>避免在代码中硬编码环境判断</p></li>
+<li><p>使用环境工具类获取环境</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">seatools.env</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_env</span>
+
+<span class="n">env</span> <span class="o">=</span> <span class="n">get_env</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">is_dev</span><span class="p">():</span>
+    <span class="c1"># 开发环境逻辑</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id9">
+<h2>日志最佳实践<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<section id="id10">
+<h3>1. 日志配置<a class="headerlink" href="#id10" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>按日期滚动日志文件</p></li>
+<li><p>设置合理的日志保留期</p></li>
+<li><p>区分不同级别日志</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">setup</span><span class="p">(</span>
+    <span class="s1">&#39;app.log&#39;</span><span class="p">,</span>
+    <span class="n">rotation</span><span class="o">=</span><span class="s1">&#39;1 days&#39;</span><span class="p">,</span>    <span class="c1"># 每天滚动</span>
+    <span class="n">retention</span><span class="o">=</span><span class="s1">&#39;30 days&#39;</span><span class="p">,</span>  <span class="c1"># 保留30天</span>
+    <span class="n">backtrace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>      <span class="c1"># 异常时显示完整堆栈</span>
+    <span class="n">diagnose</span><span class="o">=</span><span class="kc">False</span>       <span class="c1"># 生产环境关闭诊断</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id11">
+<h3>2. 日志使用<a class="headerlink" href="#id11" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>合理使用日志级别</p></li>
+<li><p>记录关键业务节点</p></li>
+<li><p>包含必要的上下文信息</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;处理订单 [orderId=</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">order_id</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># 业务逻辑</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;订单处理失败 [orderId=</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="p">,</span> <span class="n">order_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="id12">
+<h2>安全最佳实践<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<section id="id13">
+<h3>1. 密码处理<a class="headerlink" href="#id13" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>使用加盐哈希存储密码</p></li>
+<li><p>避免明文传输密码</p></li>
+<li><p>定期更新密钥</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">seatools.cryptography</span><span class="w"> </span><span class="kn">import</span> <span class="n">md5_hmac</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">hash_password</span><span class="p">(</span><span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">salt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">md5_hmac</span><span class="p">(</span><span class="n">salt</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id14">
+<h3>2. 敏感信息<a class="headerlink" href="#id14" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>使用环境变量存储密钥</p></li>
+<li><p>加密存储敏感配置</p></li>
+<li><p>限制敏感信息访问范围</p></li>
+</ul>
+</section>
+</section>
+<section id="id15">
+<h2>性能优化建议<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<section id="id16">
+<h3>1. 缓存使用<a class="headerlink" href="#id16" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>合理使用缓存</p></li>
+<li><p>设置适当的过期时间</p></li>
+<li><p>及时清理无用缓存</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@cache</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;user-$</span><span class="si">{user_id}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">user_dao</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="id17">
+<h3>2. 数据库优化<a class="headerlink" href="#id17" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>使用连接池</p></li>
+<li><p>避免 N+1 查询问题</p></li>
+<li><p>合理使用批量操作</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 批量插入</span>
+<span class="n">session</span><span class="o">.</span><span class="n">bulk_save_objects</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
+
+<span class="c1"># 避免 N+1</span>
+<span class="n">users</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">User</span><span class="p">)</span><span class="o">.</span><span class="n">options</span><span class="p">(</span>
+    <span class="n">joinedload</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">orders</span><span class="p">)</span>
+<span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="env.html" class="btn btn-neutral float-left" title="环境管理" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="builders.html" class="btn btn-neutral float-right" title="构建器工具" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, dragons96.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

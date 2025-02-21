@@ -1,0 +1,161 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>缓存支持 &mdash; Seatools 1.0.35 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=a6e84886"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="重试机制" href="retry.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Seatools
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ioc.html">IOC 容器详解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="files.html">文件处理工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">数据模型</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notices.html">通知服务</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">数据库支持</a></li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">实用工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="env.html">环境管理</a></li>
+<li class="toctree-l1"><a class="reference internal" href="best_practices.html">最佳实践指南</a></li>
+<li class="toctree-l1"><a class="reference internal" href="builders.html">构建器工具</a></li>
+<li class="toctree-l1"><a class="reference internal" href="retry.html">重试机制</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">缓存支持</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id2">内存缓存</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">分布式缓存</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Seatools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">缓存支持</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cache.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="id1">
+<h1>缓存支持<a class="headerlink" href="#id1" title="Link to this heading"></a></h1>
+<section id="id2">
+<h2>内存缓存<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<p>提供基于内存的缓存支持:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">seatools.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cache</span>
+
+<span class="n">cache</span> <span class="o">=</span> <span class="n">Cache</span><span class="p">()</span>
+
+<span class="c1"># 基于键值的缓存</span>
+<span class="nd">@cache</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;user-$</span><span class="si">{user_id}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">user_dao</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+
+<span class="c1"># 清除缓存</span>
+<span class="n">cache</span><span class="o">.</span><span class="n">clear</span><span class="p">(</span><span class="s1">&#39;user-1&#39;</span><span class="p">)</span>
+
+<span class="c1"># 清除所有缓存</span>
+<span class="n">cache</span><span class="o">.</span><span class="n">clear_all</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="id3">
+<h2>分布式缓存<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>使用前需要安装redis依赖:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>redis
+</pre></div>
+</div>
+<p>基于 Redis 的分布式缓存支持:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">seatools.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedisCache</span>
+
+<span class="n">cache</span> <span class="o">=</span> <span class="n">RedisCache</span><span class="p">(</span>
+    <span class="n">host</span><span class="o">=</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+    <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span>
+    <span class="n">db</span><span class="o">=</span><span class="mi">0</span>
+<span class="p">)</span>
+
+<span class="nd">@cache</span><span class="o">.</span><span class="n">cache</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s1">&#39;user-$</span><span class="si">{user_id}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">user_dao</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="retry.html" class="btn btn-neutral float-left" title="重试机制" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, dragons96.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
