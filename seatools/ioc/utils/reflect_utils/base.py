@@ -14,10 +14,16 @@ def get_all_py_modules(package_or_module_name: str):
         package_path = package_or_module.__path__[0]
         for root, _, files in os.walk(package_path):
             for file in files:
-                if file.endswith(".py") and file != "__init__.py":
-                    module_path = os.path.relpath(os.path.join(root, file), package_path)
+                if file.endswith(".py"):
+                    if file == '__init__.py':
+                        module_path = os.path.relpath(root, package_path)
+                    else:
+                        module_path = os.path.relpath(os.path.join(root, file), package_path)
                     module_name = os.path.splitext(module_path)[0].replace(os.path.sep, '.')
-                    py_modules.append(f"{package_or_module_name}.{module_name}")
+                    if module_name == '.':
+                        py_modules.append(f"{package_or_module_name}")
+                    else:
+                        py_modules.append(f"{package_or_module_name}.{module_name}")
         return py_modules
     # 否则本身就是一个模块
     py_modules.append(package_or_module_name)
