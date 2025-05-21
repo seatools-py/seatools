@@ -52,6 +52,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://gitee.com/dragons96/seatools',
-    version='1.0.37',
+    version='1.0.38',
     zip_safe=False,
 )
