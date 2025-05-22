@@ -1,6 +1,7 @@
 from typing import Any, Type, TypeVar, Union
+from seatools.ioc.utils.type_utils import is_async_function
 
-from seatools.ioc.beans.proxy import DelayAutowiredClassBeanProxy, DelayConfigAutowiredClassBeanProxy
+from seatools.ioc.beans.proxy import DelayAutowiredClassBeanProxy, AsyncCallDelayAutowiredClassBeanProxy, DelayConfigAutowiredClassBeanProxy
 from seatools.ioc.beans.proxy.base import BasicTypeMixin
 from seatools.ioc.constants import required as default_required
 
@@ -18,6 +19,8 @@ class Autowired:
             cls: 类型
             required: 是否必须, 为true找不到注入对象会报错
         """
+        if cls is not None and is_async_function(getattr(cls, '__call__')):
+            return AsyncCallDelayAutowiredClassBeanProxy(name=value, obj=cls, required=required)
         return DelayAutowiredClassBeanProxy(name=value, obj=cls, required=required)
 
 

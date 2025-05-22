@@ -9,7 +9,7 @@ from ...utils import name_utils
 from .base import BeanFactory
 from .initializing_bean import InitializingBean
 from ...injects.objects import Autowired
-from ...utils.type_utils import is_basic_type
+from ...utils.type_utils import is_basic_type, is_async_function
 
 _T = TypeVar('_T', bound=Any)
 
@@ -108,7 +108,11 @@ class SimpleBeanFactory(BeanFactory):
     def _register_class_object_bean(self, name, obj, primary: bool = False, aspect: bool = False,
                                     order: int = 0) -> Any:
         name = name or name_utils.to_camel_case(obj.__class__.__name__, upper_case=False)
-        proxy = ClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
+        call_func = getattr(obj, '__call__', None)
+        if is_async_function(call_func):
+            proxy = AsyncCallClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
+        else:
+            proxy = ClassBeanProxy(name=name, obj=obj, primary=primary, order=order, aspect=aspect)
         if self._enable_aspect:
             if aspect:
                 self._aspect_bean.append(proxy)

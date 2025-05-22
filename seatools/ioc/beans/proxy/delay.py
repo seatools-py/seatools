@@ -31,6 +31,12 @@ class DelayAutowiredClassBeanProxy(BaseBeanProxy):
         return self._cls
 
 
+class AsyncCallDelayAutowiredClassBeanProxy(DelayAutowiredClassBeanProxy):
+
+    async def __call__(self, *args, **kwargs):
+        return await self.ioc_bean()(*args, **kwargs)
+
+
 class DelayConfigAutowiredClassBeanProxy(BaseBeanProxy):
 
     def __init__(self, name: str, obj: Any, *args, **kwargs):

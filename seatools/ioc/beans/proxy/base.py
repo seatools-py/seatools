@@ -85,7 +85,7 @@ class BaseBeanProxy(BasicTypeMixin, abc.ABC):
     def __getattribute__(self, item):
         if item.startswith('__') and item.endswith('__'):
             attr = getattr(self.ioc_bean(), item)
-            if callable(attr):
+            if item in ('__getattribute__', '__getattr__', '__setattr__', '__delattr__'):
                 def wrapper(*args, **kwargs):
                     return attr(*args, **kwargs)
 
@@ -147,6 +147,12 @@ class ClassBeanProxy(BaseBeanProxy):
 
     def ioc_order(self):
         return self._order
+
+
+class AsyncCallClassBeanProxy(ClassBeanProxy):
+
+    async def __call__(self, *args, **kwargs):
+        return await self.ioc_bean()(*args, **kwargs)
 
 
 def get_real_type(obj):
