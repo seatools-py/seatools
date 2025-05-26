@@ -2,7 +2,7 @@ from pydantic import BaseModel as BM, ConfigDict, Field
 from pydantic.fields import FieldInfo
 from abc import ABC
 import datetime
-from typing import Optional, Any, List
+from typing import Optional, Any, List, TypeVar, Generic
 
 
 class BaseModel(BM, ABC):
@@ -56,14 +56,17 @@ class BaseModel(BM, ABC):
         return [enhance_str_type]
 
 
-class R(BaseModel):
+_T = TypeVar('_T', bound=Any)
+
+
+class R(BaseModel, Generic[_T]):
     """通用响应对象"""
     # 状态码
     code: int = Field(..., title='状态码')
     # 状态信息
     msg: str = Field(..., title='状态信息')
     # 响应数据
-    data: Optional[Any] = Field(None, title='响应数据')
+    data: Optional[_T] = Field(None, title='响应数据')
 
     @staticmethod
     def ok(data: Optional[Any] = None, msg: str = '请求成功', code: int = 200):
@@ -74,10 +77,10 @@ class R(BaseModel):
         return R(code=code, msg=msg, data=None)
 
 
-class PageModel(BaseModel):
+class PageModel(BaseModel, Generic[_T]):
     """分页Model, 可作分页入参可作分页出参, 入参仅需传入page, 与page_size, 出参则均需传入"""
     # 分页数据记录列表
-    rows: Optional[List[Any]] = Field([], title='分页数据记录列表')
+    rows: Optional[List[_T]] = Field([], title='分页数据记录列表')
     # 当前页码
     page: Optional[int] = Field(1, title='当前页码')
     # 当前页大写
@@ -86,9 +89,9 @@ class PageModel(BaseModel):
     total: Optional[int] = Field(0, title='记录总数')
 
 
-class PageR(R):
+class PageR(R, Generic[_T]):
     """通用分页响应"""
-    data: Optional[PageModel] = Field(..., title='响应数据')
+    data: Optional[PageModel[_T]] = Field(..., title='响应数据')
 
     @staticmethod
     def ok(data: Optional[PageModel] = None, msg: str = '请求成功', code: int = 200):
