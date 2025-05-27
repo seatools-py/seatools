@@ -2,7 +2,7 @@ from pydantic import BaseModel as BM, ConfigDict, Field
 from pydantic.fields import FieldInfo
 from abc import ABC
 import datetime
-from typing import Optional, Any, List, TypeVar, Generic
+from typing import Optional, Any, TypeVar, Generic, Sequence
 
 
 class BaseModel(BM, ABC):
@@ -80,7 +80,7 @@ class R(BaseModel, Generic[_T]):
 class PageModel(BaseModel, Generic[_T]):
     """分页Model, 可作分页入参可作分页出参, 入参仅需传入page, 与page_size, 出参则均需传入"""
     # 分页数据记录列表
-    rows: Optional[List[_T]] = Field([], title='分页数据记录列表')
+    rows: Optional[Sequence[_T]] = Field([], title='分页数据记录列表')
     # 当前页码
     page: Optional[int] = Field(1, title='当前页码')
     # 当前页大写
