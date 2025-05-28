@@ -1,13 +1,12 @@
 import asyncio
 import functools
 import uuid
-import warnings
 from typing import Optional
 import inspect
 from contextvars import ContextVar
 
 from seatools.utils import list_utils
-from seatools.ioc import Autowired
+from seatools.ioc.injects import Autowired
 from seatools.sqlalchemy import SqlAlchemyClient, AsyncSqlAlchemyClient
 
 __db_context_id = ContextVar('sqlalchemy_context_id')
@@ -42,7 +41,7 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
         autocommit: Session.autocommit
         kw: 额外的Session参数配置
     """
-    warnings.warn('Use seatools.ioc.sqlalchemy.auto_session repeat it.', DeprecationWarning)
+
     def init_sqlalchemy_context_id():
         try:
             __db_context_id.get()
@@ -149,8 +148,6 @@ def new_session(*args, db: Optional[str] = None, field_name: Optional[str] = 'se
         autocommit: Session.autocommit
         kw: Session额外参数
     """
-    warnings.warn('Use seatools.ioc.sqlalchemy.new_session repeat it.', DeprecationWarning)
-
     def wrapper(func):
         @functools.wraps(func)
         async def async_wrapper(*args, **kwargs):

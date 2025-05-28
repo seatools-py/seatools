@@ -1,2 +1,1 @@
-from .base import run
-
+from .base import run, SeatoolsBoot

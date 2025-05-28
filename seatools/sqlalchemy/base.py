@@ -117,7 +117,7 @@ class SqlAlchemyClient:
         self._session_maker = sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @contextmanager
-    def session(self, **kw) -> Session:
+    def session(self, autocommit: bool = True, **kw) -> Session:
         """获取session上下文对象
 
         使用示例:
@@ -129,7 +129,8 @@ class SqlAlchemyClient:
         session = self._session_maker(**kw)
         try:
             yield session
-            session.commit()
+            if autocommit:
+                session.commit()
         except Exception as e:
             session.rollback()
             raise e
@@ -164,7 +165,7 @@ class AsyncSqlAlchemyClient:
         self._session_maker = async_sessionmaker(bind=self._engine, expire_on_commit=False, class_=session_cls)
 
     @asynccontextmanager
-    async def session(self, **kw) -> AsyncSession:
+    async def session(self, autocommit: bool = True, **kw) -> AsyncSession:
         """获取session上下文对象
 
         使用示例:
@@ -176,7 +177,8 @@ class AsyncSqlAlchemyClient:
         session = self._session_maker(**kw)
         try:
             yield session
-            await session.commit()
+            if autocommit:
+                await session.commit()
         except Exception as e:
             await session.rollback()
             raise e
