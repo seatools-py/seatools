@@ -49,21 +49,29 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
             context_id = uuid.uuid4()
             __db_context_id.set(context_id)
 
-    async def do_async_func(func, *args, session, **kwargs):
+    async def do_async_func(func, *args, _inner_extra, **kwargs):
         context_id = __db_context_id.get()
-        __db_session_map[context_id] = session
-        kwargs[field_name] = session
+        if __db_session_map.get(context_id) is None:
+            __db_session_map[context_id] = {}
+        __db_session_map[context_id][db] = _inner_extra["session"]
+        kwargs[field_name] = _inner_extra["session"]
         ans = await func(*args, **kwargs)
-        if context_id in __db_session_map:
+        if context_id in __db_session_map and db in __db_session_map[context_id]:
+            del __db_session_map[context_id][db]
+        if context_id in __db_session_map and len(__db_session_map[context_id]) == 0:
             del __db_session_map[context_id]
         return ans
 
-    def do_func(func, *args, session, **kwargs):
+    def do_func(func, *args, _inner_extra, **kwargs):
         context_id = __db_context_id.get()
-        __db_session_map[context_id] = session
-        kwargs[field_name] = session
+        if __db_session_map.get(context_id) is None:
+            __db_session_map[context_id] = {}
+        __db_session_map[context_id][db] = _inner_extra["session"]
+        kwargs[field_name] = _inner_extra["session"]
         ans = func(*args, **kwargs)
-        if context_id in __db_session_map:
+        if context_id in __db_session_map and db in __db_session_map[context_id]:
+            del __db_session_map[context_id][db]
+        if context_id in __db_session_map and len(__db_session_map[context_id]) == 0:
             del __db_session_map[context_id]
         return ans
 
@@ -73,9 +81,9 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
             if kwargs.get(field_name):
                 return await func(*args, **kwargs)
             init_sqlalchemy_context_id()
-            session = __db_session_map.get(__db_context_id.get())
-            if session:
-                kwargs[field_name] = session
+            session_dict = __db_session_map.get(__db_context_id.get())
+            if session_dict and session_dict.get(db):
+                kwargs[field_name] = session_dict[db]
                 return await func(*args, **kwargs)
             cli = Autowired(db, cls=AsyncSqlAlchemyClient, required=False)
             # 检查是否存在bean实例
@@ -84,29 +92,29 @@ def auto_session(*args, db: Optional[str] = None, field_name: Optional[str] = 's
                     autocommit=autocommit,
                     **kw,
                 ) as session:
-                    return await do_async_func(func, session=session, *args, **kwargs)
+                    return await do_async_func(func, _inner_extra=dict(session=session), *args, **kwargs)
             cli = Autowired(db, cls=SqlAlchemyClient)
             with cli.session(
                 autocommit=autocommit,
                 **kw,
             ) as session:
-                return await do_async_func(func, session=session, *args, **kwargs)
+                return await do_async_func(func, _inner_extra=dict(session=session), *args, **kwargs)
 
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
             if kwargs.get(field_name):
                 return func(*args, **kwargs)
             init_sqlalchemy_context_id()
-            session = __db_session_map.get(__db_context_id.get())
-            if session:
-                kwargs[field_name] = session
+            session_dict = __db_session_map.get(__db_context_id.get())
+            if session_dict and session_dict.get(db):
+                kwargs[field_name] = session_dict[db]
                 return func(*args, **kwargs)
             cli = Autowired(db, cls=SqlAlchemyClient)
             with cli.session(
                 autocommit=autocommit,
                 **kw,
             ) as session:
-                return do_func(func, session=session, *args, **kwargs)
+                return do_func(func, _inner_extra=dict(session=session), *args, **kwargs)
 
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
